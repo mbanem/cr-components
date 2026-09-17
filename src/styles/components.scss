@@ -1,0 +1,154 @@
+/* src/styles/components.scss */
+@use './variables' as *;
+@use './mixins' as *;
+/* =========================================================
+ CR INPUT CONTAINER
+ =========================================================*/
+
+.cr-input-container {
+  display: inline-block;
+  width: clamp(16rem, 18.3rem, 30rem);
+  margin-bottom: 1rem;
+  font-family: $cr-font-family;
+}
+
+/* =========================================================
+ INPUT WRAPPER
+ =========================================================*/
+
+.cr-input-container .input-wrapper {
+  position: relative;
+  margin-top: 1.25rem;
+}
+
+
+/* =========================================================
+ INPUT
+ =========================================================*/
+
+.cr-input-container .cr-input {
+  @include cr-input-base;
+}
+
+
+/* =========================================================
+ INPUT :FOCUS
+ =========================================================*/
+
+.cr-input-container .cr-input:focus {
+  @include cr-input-focus;
+}
+
+
+/* =========================================================
+ PLACEHOLDER
+ =========================================================*/
+
+.cr-input-container .cr-input::placeholder {
+  @include cr-input-placeholder;
+}
+
+
+/* =========================================================
+ FLOATING LABEL - BASE (Placeholder state)
+ =========================================================*/
+
+.cr-input-container .floating-label {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  /* Centered inside input like a true placeholder */
+  background: transparent;
+  /* Transparent when inside input */
+  padding: 0 0.25rem;
+  color: $cr-label-color;
+  opacity: 0.6;
+  pointer-events: none;
+
+  transition:
+    transform 0.2s ease,
+    top 0.2s ease,
+    font-size 0.2s ease,
+    opacity 0.2s ease,
+    background-color 0.2s ease;
+
+  max-width: calc(100% - 1.5rem);
+  display: flex;
+  white-space: nowrap;
+}
+
+/* =========================================================
+ FLOATING LABEL - ACTIVE (Floated on top border)
+ =========================================================*/
+
+.cr-input-container .floating-label.floating {
+  top: 0;
+  transform: translateY(-75%);
+  /* Keeps it vertically centered on the top border */
+  background: $cr-label-background;
+  /* Covers the border line behind the text */
+  font-size: 0.85rem;
+  opacity: 1;
+  color: $cr-label-focus-color;
+}
+
+.cr-input-container .floating-label {
+  color: $cr-label-color;
+}
+
+/* =========================================================
+ FLOATING LABEL - ERROR
+ =========================================================*/
+
+.cr-input-container .cr-input.has-error~.floating-label.floating {
+  color: $cr-input-error-color;
+}
+
+
+/* =========================================================
+ LABEL TEXT
+ =========================================================*/
+
+.cr-input-container .label-text {
+  flex-shrink: 0;
+  color: $cr-label-focus-color;
+  /* TODO this makes problem comment it out*/
+}
+
+
+/* =========================================================
+ ERROR TEXT
+ =========================================================*/
+
+.cr-input-container .error-text {
+  color: tomato;
+  font:
+    italic 10px/2.1 Arial,
+    sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: help;
+}
+
+
+/* =========================================================
+ ERROR INPUT
+ =========================================================*/
+
+.cr-input-container .cr-input.has-error {
+  color: $cr-input-color;
+  border-color: $cr-input-error-color;
+}
+
+
+/* =========================================================
+ DISABLED
+ =========================================================*/
+
+.cr-input-container.disabled {
+  opacity: $cr-input-disabled-opacity;
+  pointer-events: none;
+}

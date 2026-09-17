@@ -1,3 +1,15 @@
+@use './variables' as *;
+
+@mixin cr-input-base {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 1rem;
+  font-size: 1rem;
+  border: $cr-input-border;
+  border-radius: 4px;
+  outline: none;
+}
+
 @mixin container($caption: 'container',
   $padding: 1rem 2rem,
   $color: var(panel-color),
@@ -141,4 +153,16 @@
     color: var(--candidate-color);
     background-color: var(--candidate-bg-color);
   }
+}
+
+@mixin cr-input-focus {
+  border-color: $cr-input-focus-border-color;
+  box-shadow: $cr-input-focus-shadow;
+}
+
+@mixin cr-input-placeholder {
+  color: $cr-input-placeholder-color;
+  opacity: $cr-input-placeholder-opacity;
+  font-size: 0.9rem;
+  font-weight: 400;
 }
