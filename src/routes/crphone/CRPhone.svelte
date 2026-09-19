@@ -1,15 +1,9 @@
 <script lang="ts" module>
-	// Pure helper function to split camelCase/PascalCase and capitalize tokens
-	// e.g., "phoneNumber" -> "Phone Number"
-	// It tries to convert any char, event non-letter, preceding with witespace
+	export const phoneFormat = 'in format xxx-xxx-xxxx, ext. xx';
 	export function capitalizeText(str: string): string {
-		return (
-			str
-				// Insert space before capital letters and lowercase letters following digits
-				.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-				// Capitalize the first letter of every word
-				.replace(/\b\w/g, (char) => char.toUpperCase())
-		);
+		return str
+			.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+			.replace(/\b\w/g, (char) => char.toUpperCase());
 	}
 </script>
 
@@ -47,8 +41,7 @@
 	});
 
 	let prettyLabel = $derived(capitalizeText(label));
-	const commaKeyMessage =
-		'press comma key to enter extension\nand this is just to force ellipses in the message';
+	const commaKeyMessage = 'press comma key to enter extension';
 	// let isLabelFloating = $state(true);
 	let isLabelFloating = $derived(isFocused || value.length > 0 || errorMessage.length > 0);
 	let computedPlaceholder = $derived(
@@ -78,10 +71,8 @@
 		const start = input.selectionStart;
 		const end = input.selectionEnd;
 
-		// Perform your state update or value transformation
 		value = input.value;
 
-		// Force Svelte 5 to flush the DOM change, then restore the cursor position
 		tick().then(() => {
 			input.setSelectionRange(start, end);
 		});
@@ -89,19 +80,20 @@
 
 	function handleKeyup(e: KeyboardEvent) {
 		if (e.key === 'Backspace') {
+			if (value.endsWith(', ')) {
+				value = value.slice(0, -2);
+			}
 			return;
 		}
 		if (value.length === 12) {
 			errorMessage = commaKeyMessage;
+		} else if (value.length === 13) {
+			isErroneous?.(value);
 		}
-		tick().then(() => {
-			return new Promise((resolve) => setTimeout(resolve, 100));
-		});
 
-		if (isErroneous && errorMessage !== commaKeyMessage) {
-			errorMessage = isErroneous(value);
-		}
 		value = formatPhoneNumber(value);
+
+		onValueChange?.(value);
 
 		if (e.key === 'Enter') {
 			dispatchValue('Enter');
@@ -129,20 +121,16 @@
 		if (e.key.length > 1 || e.ctrlKey || e.metaKey || e.altKey) {
 			return;
 		}
-		if (value.length === 12 && e.key !== ',') {
-			e.preventDefault(); // Suppress the invalid key injection natively
+		// Build a safe regex tester from the allowedChars string parameter
+		if (value.length === 12 && e.key === ',') {
 			return;
 		}
-		// Build a safe regex tester from the allowedChars string parameter
 		const regex = new RegExp(`^[0-9-,x]$`);
 		if (!regex.test(e.key)) {
-			console.log('invalid key');
 			e.preventDefault(); // Suppress the invalid key injection natively
 		}
 	}
-
 	function dispatchValue(triggerEvent: typeof reportOn) {
-		// Trigger callback if the event matches user requirements
 		if (reportOn === triggerEvent && onValueChange) {
 			onValueChange(value);
 		}
@@ -163,7 +151,6 @@
 			onblur={handleBlur}
 			onfocus={handleFocus}
 			onkeydown={handleKeydown}
-			oncontextmenu={handleRightClick}
 		/>
 
 		<label for="idSpan" class="floating-label" class:floating={isLabelFloating}>

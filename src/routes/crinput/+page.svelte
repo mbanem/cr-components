@@ -43,4 +43,4 @@
 		</button>
 	</div>
 </div>
-<Tooltip bind:this={tooltip} />*/
+<Tooltip bind:this={tooltip} />

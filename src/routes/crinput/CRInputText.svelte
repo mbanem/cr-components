@@ -88,8 +88,6 @@
 	}
 </script>
 
-n
-
 <div class={`cr-input-container ${className} ${isDisabled ? 'disabled' : ''}`}>
 	<div class="input-wrapper">
 		<input

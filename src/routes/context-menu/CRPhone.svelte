@@ -17,6 +17,7 @@
 	import { tick } from 'svelte';
 	import formatPhoneNumber from '$lib/utils/phone-number';
 	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { validateHeaderName } from 'http';
 
 	interface PROPS extends Partial<HTMLInputAttributes> {
 		label: string;
@@ -94,6 +95,9 @@
 		if (value.length === 12) {
 			errorMessage = commaKeyMessage;
 		}
+		// if (value.length === 13 && value.endsWith(', ext')) {
+		// 	errorMessage = commaKeyMessage;
+		// }
 		tick().then(() => {
 			return new Promise((resolve) => setTimeout(resolve, 100));
 		});

@@ -20,7 +20,7 @@
 	// By wrapping it in an arrow function (action: () => ...), you create deferred/lazy
 	// evaluation. The code inside the function body is completely paused and ignored by
 	// the browser engine until the exact millisecond action() is invoked by your click handler!
-	const clearActions: ContextAction[] = [
+	const actions: ContextAction[] = [
 		{
 			label: 'Clear Field',
 			action: () => crphone?.reset()
@@ -28,13 +28,17 @@
 	];
 
 	async function handleContextMenu(e: MouseEvent) {
+		// make HTML markup with contextmenu available and bind to menuRef
+		// so we can call exported function on it, e.g. openMenu
 		showMenu = true;
+		// important! give DOM/Svelte time to bind to now undefined menuRef
 		await tick();
 		menuRef?.openMenu(e);
+		// now wait as some of actions could be called from ContextMenu
 	}
 </script>
 
 <div oncontextmenu={handleContextMenu} role="button" aria-haspopup="menu" tabindex={0}>
 	<CRPhone label="phoneNumber" bind:this={crphone} />
-	<ContextMenu bind:this={menuRef} options={clearActions} bind:showMenu />
+	<ContextMenu bind:this={menuRef} options={actions} bind:showMenu />
 </div>
