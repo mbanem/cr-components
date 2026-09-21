@@ -11,6 +11,7 @@
 	import { tick } from 'svelte';
 	import formatPhoneNumber from '$lib/utils/phone-number';
 	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { setCssVarColor } from '$lib/utils/client-helpers';
 
 	interface PROPS extends Partial<HTMLInputAttributes> {
 		label: string;
@@ -35,15 +36,22 @@
 
 	let isFocused = $state(false);
 	let isDirty = $state(false);
+	let placeholder = $state('');
 	let errorMessage = $derived.by(() => {
-		if (!isDirty) return '';
-		return isErroneous ? isErroneous(value) : '';
+		if (!isDirty) {
+			return '';
+		}
+		const res = isErroneous ? isErroneous(value) : value === '' ? 'Entry is required' : '';
+		console.log('it is dirty, msg is', res);
+		return res;
 	});
 
 	let prettyLabel = $derived(capitalizeText(label));
 	const commaKeyMessage = 'press comma key to enter extension';
 	// let isLabelFloating = $state(true);
-	let isLabelFloating = $derived(isFocused || value.length > 0 || errorMessage.length > 0);
+	let isLabelFloating = $derived(
+		isFocused || value.length > 0 || errorMessage.length > 0 || placeholder
+	);
 	let computedPlaceholder = $derived(
 		!isFocused && value.length === 0 && isDirty ? `${prettyLabel} is required` : ''
 	);
@@ -101,10 +109,18 @@
 	}
 
 	function handleBlur() {
+		console.log('handleBlur');
 		isFocused = false;
 		isDirty = true; // 👈 Element has officially been visited/blurred
-
-		dispatchValue('blur');
+		if (!value) {
+			placeholder = 'Entry is required';
+			setCssVarColor('--cr-input-placeholder-color', 'crimson');
+		}
+		tick().then(() => {
+			return new Promise((resolve) => setTimeout(resolve, 300));
+		});
+		console.log('isLabelFloating?', isLabelFloating);
+		// dispatchValue('blur');
 	}
 
 	function handleFocus() {
@@ -151,6 +167,7 @@
 			onblur={handleBlur}
 			onfocus={handleFocus}
 			onkeydown={handleKeydown}
+			{placeholder}
 		/>
 
 		<label for="idSpan" class="floating-label" class:floating={isLabelFloating}>
@@ -170,3 +187,9 @@
 		</label>
 	</div>
 </div>
+
+<style lang="scss">
+	input::placeholder {
+		color: var(--cr-input-placeholder-color);
+	}
+</style>

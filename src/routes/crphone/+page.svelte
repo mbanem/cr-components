@@ -4,7 +4,7 @@
 	let first = $state('');
 	let phone = $state('');
 
-	function handleApiReport(val: string) {
+	function onPhoneValueChange(val: string) {
 		console.log('Parent hook triggered with processed string: ', val);
 	}
 
@@ -36,7 +36,7 @@
 		label="phoneNumber"
 		reportOn="blur"
 		bind:value={phone}
-		onValueChange={handleApiReport}
+		onValueChange={onPhoneValueChange}
 		isErroneous={phoneError}
 		class="main"
 	/>

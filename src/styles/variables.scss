@@ -1,6 +1,60 @@
 /* src/styles/variables.scss */
 
+
+
+/* ---------------------------------------------------------
+ Typography
+ ---------------------------------------------------------*/
+
+$cr-font-family: system-ui,
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  sans-serif;
+
+:root {
+  --cr-color-primary: #3b82f6;
+  --cr-input-placeholder-color: gray;
+  --cr-color-error: #dc2626;
+}
+
+// 2. SCSS Variable Abstractions (Convenient shortcuts for development)
+// $cr-placeholder: #{var(--cr-color-placeholder, #9ca3af)};
+$cr-primary: #{var(--cr-color-primary, #3b82f6)};
+$cr-error: #{var(--cr-color-error, #dc2626)};
+/* ---------------------------------------------------------
+    Input
+----------------------------------------------------------*/
+
+$cr-input-font-size: 1rem;
+$cr-input-padding: 6px 1rem;
+
+$cr-input-border: 1px solid gray;
+$cr-input-border-radius: 4px;
+
+$cr-input-focus-border-color: #0066cc;
+$cr-input-focus-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+
+$cr-input-placeholder-color: #{var(--cr-input-placeholder-color, #808080)};
+$cr-input-placeholder-opacity: 0.5;
+
+$cr-input-color: black;
+$cr-input-error-color: #cc0000;
+
+$cr-input-disabled-opacity: 0.5;
+
+
+/* ---------------------------------------------------------
+ Floating label
+ ---------------------------------------------------------*/
+
+$cr-label-color: #777;
+$cr-label-focus-color: #0066cc;
+
+$cr-label-background: white;
+
 :global(:root) {
+
   --attr-id: #008000;
   --badge-color: #000080;
   --badge-bg-color: #f0f8ff;
@@ -83,45 +137,3 @@
   --pre-title-color: skyblue;
   --pre-title-shadow: rgb(255, 255, 255, 0.8);
 }
-
-/* ---------------------------------------------------------
- Typography
- ---------------------------------------------------------*/
-
-$cr-font-family: system-ui,
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  sans-serif;
-
-
-/* ---------------------------------------------------------
-    Input
-----------------------------------------------------------*/
-
-$cr-input-font-size: 1rem;
-$cr-input-padding: 6px 1rem;
-
-$cr-input-border: 1px solid gray;
-$cr-input-border-radius: 4px;
-
-$cr-input-focus-border-color: #0066cc;
-$cr-input-focus-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
-
-$cr-input-placeholder-color: crimson;
-$cr-input-placeholder-opacity: 0.5;
-
-$cr-input-color: black;
-$cr-input-error-color: #cc0000;
-
-$cr-input-disabled-opacity: 0.5;
-
-
-/* ---------------------------------------------------------
- Floating label
- ---------------------------------------------------------*/
-
-$cr-label-color: #777;
-$cr-label-focus-color: #0066cc;
-
-$cr-label-background: white;

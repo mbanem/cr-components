@@ -3,7 +3,19 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  preprocess: vitePreprocess(),
+  // Pass style options directly to vitePreprocess
+  preprocess: vitePreprocess({
+    script: true,
+    style: {
+      css: {
+        preprocessorOptions: {
+          scss: {
+            api: 'modern-compiler' // Enforces Dart Sass modern API
+          }
+        }
+      }
+    }
+  }),
   kit: {
     adapter: adapter(),
     alias: {

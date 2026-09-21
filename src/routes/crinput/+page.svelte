@@ -28,9 +28,11 @@
 		label="firstName"
 		bind:value={formValue}
 		bind:this={nameInputRef}
+		allowedChars="[a-zA-z -]"
 		capitalize="capitalize"
 		isErroneous={firstNameError}
 		isDisabled={false}
+		reportOn="Enter"
 		class="main"
 	/>
 

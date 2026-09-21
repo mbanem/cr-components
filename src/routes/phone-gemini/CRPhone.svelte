@@ -34,6 +34,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { setCssVarColor } from '$lib/utils/client-helpers';
 
 	interface PROPS extends Partial<HTMLInputAttributes> {
 		label: string;
@@ -57,17 +58,25 @@
 
 	let isFocused = $state(false);
 	let isDirty = $state(false);
+	let placeholder = $state('');
+	const REFORMAT = 'DONE? Hit Enter to reformat';
+	let reformat = $state('');
 
 	let errorMessage = $derived.by(() => {
 		if (!isDirty && !isFocused) return '';
 		if (value.length === 12) {
 			return commaKeyMessage;
 		}
-		return isErroneous ? isErroneous(value) : '';
+		if (reformat) {
+			return REFORMAT;
+		}
+		return reformat ? reformat : isErroneous ? isErroneous(value) : '';
 	});
 
 	let prettyLabel = $derived(capitalizeText(label));
-	let isLabelFloating = $derived(isFocused || value.length > 0 || errorMessage.length > 0);
+	let isLabelFloating = $derived(
+		isFocused || value.length > 0 || errorMessage.length > 0 || placeholder
+	);
 	let hasError = $derived(Boolean(errorMessage) && errorMessage !== commaKeyMessage);
 
 	export function reset() {
@@ -87,7 +96,7 @@
 
 		// 1. Get plain text from clipboard
 		const pastedText = e.clipboardData?.getData('text') || '';
-		console.log('pastedText', pastedText);
+		// console.log('pastedText', pastedText);
 		// 2. Extract digits only
 		const digits = pastedText.replace(/\D/g, '');
 		if (!digits) return;
@@ -122,6 +131,10 @@
 		dispatchValue('keyup');
 	}
 	function handleInput(e: Event) {
+		if (reformat) {
+			// console.log('handleInput reformat');
+			return;
+		}
 		const input = e.target as HTMLInputElement;
 		const rawValue = input.value;
 		const oldCursor = input.selectionStart || 0;
@@ -166,6 +179,10 @@
 	}
 
 	function handleKeyup(e: KeyboardEvent) {
+		if (reformat) {
+			// console.log('handleKeyup reformat');
+			return;
+		}
 		if (e.key === 'Backspace') {
 			if (/(, |-)$/.test(value)) {
 				value = value.slice(0, -2);
@@ -187,11 +204,21 @@
 		}
 	}
 	function handleKeydown(e: KeyboardEvent) {
-		const input = e.target as HTMLInputElement;
-		const digits = input.value.replace(/\D/g, '');
+		const el = e.target as HTMLInputElement;
+		if (e.key === 'Enter' && reformat) {
+			reformat = '';
+			setCssVarColor('--cr-input-placeholder-color', 'crimson');
+			tick().then(() => {
+				return new Promise((resolve) => setTimeout(resolve, 300));
+			});
+			value = formatPhoneNumber(el.value);
+			const pos = el.value.length;
+			el.setSelectionRange(pos, pos);
+		}
+		const digits = el.value.replace(/\D/g, '');
 		// Inside handleKeydown in CRPhone.svelte
 		if (e.key === ',') {
-			const isAtEnd = input.selectionStart === value.length;
+			const isAtEnd = el.selectionStart === value.length;
 			// Only allow comma if we have 10 digits and the cursor is at the very end
 			if (digits.length === 10 && isAtEnd && !value.endsWith(',')) {
 				return; // Allow comma insertion
@@ -201,8 +228,24 @@
 
 		// 1. Atomic Backspacing for ", ext. "
 		if (e.key === 'Backspace') {
+			// console.log('it is backspace');
+			if ((el.selectionStart as number) <= 12) {
+				if (el.value.length > 12) {
+					// console.log('keydown inside number');
+					reformat = REFORMAT;
+					isDirty = true;
+					tick().then(() => {
+						return new Promise((resolve) => setTimeout(resolve, 300));
+					});
+					setCssVarColor('--cr-input-placeholder-color', 'green');
+					tick().then(() => {
+						return new Promise((resolve) => setTimeout(resolve, 300));
+					});
+					return;
+				}
+			}
 			const extIndex = value.indexOf(', ext. ');
-			if (extIndex !== -1 && input.selectionStart === extIndex + 7) {
+			if (extIndex !== -1 && el.selectionStart === extIndex + 7) {
 				e.preventDefault();
 				value = value.slice(0, extIndex);
 				dispatchValue('keyup');
@@ -228,12 +271,29 @@
 	}
 
 	function handleBlur() {
+		// console.log('handleBlur');
 		isFocused = false;
-		isDirty = true;
+		// isDirty = true;  // at this state do not show message
+		if (!value) {
+			placeholder = 'Entry is required';
+			setCssVarColor('--cr-input-placeholder-color', 'crimson');
+		}
+		tick().then(() => {
+			return new Promise((resolve) => setTimeout(resolve, 300));
+		});
 		dispatchValue('blur');
 	}
 
 	function handleFocus() {
+		// console.log('handleFocus');
+		if (placeholder) {
+			isDirty = false;
+			// console.log('still placeholder?', placeholder);
+			setCssVarColor('--cr-label-focus-color', '0066cc');
+			tick().then(() => {
+				return new Promise((resolve) => setTimeout(resolve, 300));
+			});
+		}
 		isFocused = true;
 		dispatchValue('focus');
 	}
@@ -254,6 +314,7 @@
 			onpaste={handlePaste}
 			onblur={handleBlur}
 			onfocus={handleFocus}
+			{placeholder}
 		/>
 
 		<label for="idSpan" class="floating-label" class:floating={isLabelFloating}>
@@ -271,3 +332,9 @@
 		</label>
 	</div>
 </div>
+
+<style lang="scss">
+	input::placeholder {
+		color: var(--cr-input-placeholder-color);
+	}
+</style>

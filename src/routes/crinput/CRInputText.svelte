@@ -27,6 +27,11 @@
 		...restProps
 	}: PROPS = $props();
 
+	// derived.by is an arrow function and so it is reactive
+	// for all its variables involved
+	const allowed = $derived.by(() => {
+		return allowedChars?.replace(/[\[\]]/g, '');
+	});
 	let inputElement: HTMLInputElement;
 	let errorMessage = $derived(isErroneous ? isErroneous(value) : '');
 	let hasError = $derived(Boolean(errorMessage));
@@ -36,15 +41,16 @@
 		onValueChange?.(value);
 	}
 
+	// Example Usage
+	// function sanitizeInput(input: string): string {
+	// 	// Replace brackets and insert '^' at the start of the character class
+	// 	const stripPattern = new RegExp(`[^${allowed}]`, 'g');
+	// 	return input.replace(stripPattern, '');
+	// }
 	function handleInput(event: Event) {
 		const target = event.currentTarget as HTMLInputElement;
 
 		let newValue = target.value;
-
-		if (allowedChars) {
-			const expression = new RegExp(`[^${allowedChars}]`, 'g');
-			newValue = newValue.replace(expression, '');
-		}
 
 		if (capitalize === 'lowercase') {
 			newValue = newValue.toLowerCase();
@@ -57,9 +63,6 @@
 		value = newValue;
 		if (target.value !== newValue) {
 			target.value = newValue;
-		}
-		if (reportOn === 'keyup') {
-			reportValue();
 		}
 	}
 
@@ -81,10 +84,15 @@
 		}
 	}
 
-	function handleKeydown(event: KeyboardEvent) {
-		if (reportOn === 'Enter' && event.key === 'Enter') {
+	function handleKeydown(e: KeyboardEvent) {
+		if (!allowed.includes(e.key) && e.key !== 'Backspace') {
+			e.preventDefault();
+			return;
+		}
+		if ('Enter|keyup|blur|focus'.includes(e.key)) {
 			reportValue();
 		}
+		onValueChange?.(value);
 	}
 </script>
 
