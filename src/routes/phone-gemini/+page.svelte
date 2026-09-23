@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CRPhone, { phoneFormat } from './CRPhone.svelte';
 
-	let phone = $state('');
+	let phoneNumber = $state('');
 
 	function handleApiReport(val: string) {
 		console.log('parent onValueChange: ', val);
@@ -38,14 +38,13 @@
 	}
 </script>
 
-<div style="max-width: 16rem; padding: 6px 1rem;">
+<div style="max-width: 18rem; padding: 6px 1rem;">
 	<CRPhone
 		label="phoneNumber"
 		reportOn="blur"
-		bind:value={phone}
+		bind:value={phoneNumber}
 		onValueChange={handleApiReport}
 		isErroneous={phoneError}
-		class="main"
 	/>
 	<p style="margin-top:-6px;paddin:0;margin:0;">(111) 222-3333 x44</p>
 	<p style="paddin:0;margin:0;">222 444-3331 #44</p>

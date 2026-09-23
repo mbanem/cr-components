@@ -14,18 +14,22 @@ $cr-font-family: system-ui,
 
 :root {
   --cr-color-primary: #3b82f6;
-  --cr-input-placeholder-color: gray;
+  --cr-input-placeholder-color: hsl(0, 0%, 50%);
   --cr-color-error: #dc2626;
+  --cr-input-error-color: #dc143c;
+  --cr-radio-group-width: 19rem;
+  --cr-disabled-color: #808080;
 }
 
 // 2. SCSS Variable Abstractions (Convenient shortcuts for development)
 // $cr-placeholder: #{var(--cr-color-placeholder, #9ca3af)};
-$cr-primary: #{var(--cr-color-primary, #3b82f6)};
+$cr-color-primary: #{var(--cr-color-primary, #3b82f6)};
 $cr-error: #{var(--cr-color-error, #dc2626)};
 /* ---------------------------------------------------------
     Input
 ----------------------------------------------------------*/
 
+$cr-disabled-color: #{var(--cr-disabled-color, #808080)};
 $cr-input-font-size: 1rem;
 $cr-input-padding: 6px 1rem;
 
@@ -39,7 +43,7 @@ $cr-input-placeholder-color: #{var(--cr-input-placeholder-color, #808080)};
 $cr-input-placeholder-opacity: 0.5;
 
 $cr-input-color: black;
-$cr-input-error-color: #cc0000;
+$cr-input-error-color: #{var(--cr-input-error-color),#dc143c};
 
 $cr-input-disabled-opacity: 0.5;
 
@@ -53,8 +57,8 @@ $cr-label-focus-color: #0066cc;
 
 $cr-label-background: white;
 
-:global(:root) {
-
+:global(.light) {
+  --disabled-color: gray;
   --attr-id: #008000;
   --badge-color: #000080;
   --badge-bg-color: #f0f8ff;
@@ -97,6 +101,7 @@ $cr-label-background: white;
 }
 
 :global(.dark) {
+  --disabled-color: gray;
   --attr-id: #90ee90;
   --badge-color: navy;
   --badge-bg-color: #f0f8ff;

@@ -1,6 +1,8 @@
 <script lang="ts" module>
-	const commaKeyMessage = 'press comma key to enter extension';
+	const commaKeyMessage = 'press comma key for extension';
 	export const phoneFormat = 'in format xxx-xxx-xxxx, ext. xx';
+	export const REFORMAT = 'DONE? Hit Enter to reformat';
+	export const isGreen = new RegExp(/(press comma|DONE\?)/);
 
 	export function capitalizeText(str: string): string {
 		return str
@@ -38,7 +40,7 @@
 
 	interface PROPS extends Partial<HTMLInputAttributes> {
 		label: string;
-		reportOn?: 'Enter' | 'keyup' | 'blur' | 'focus';
+		reportOn?: TReportOn;
 		onValueChange?: (val: string) => void;
 		value?: string;
 		isDisabled?: boolean;
@@ -47,7 +49,7 @@
 
 	let {
 		label,
-		reportOn = 'keyup',
+		reportOn = 'keyup|Enter|blur',
 		onValueChange,
 		value = $bindable(''),
 		class: className = '',
@@ -56,37 +58,40 @@
 		...restProps
 	}: PROPS = $props();
 
-	let isFocused = $state(false);
-	let isDirty = $state(false);
-	let placeholder = $state('');
-	const REFORMAT = 'DONE? Hit Enter to reformat';
-	let reformat = $state('');
+	let s = $state({
+		isFocused: false,
+		isDirty: false,
+		placeholder: '',
+		reformat: ''
+	});
 
 	let errorMessage = $derived.by(() => {
-		if (!isDirty && !isFocused) return '';
+		if (!s.isDirty && !s.isFocused) return '';
 		if (value.length === 12) {
 			return commaKeyMessage;
 		}
-		if (reformat) {
+		if (s.reformat) {
 			return REFORMAT;
 		}
-		return reformat ? reformat : isErroneous ? isErroneous(value) : '';
+		return s.reformat ? s.reformat : isErroneous ? isErroneous(value) : '';
 	});
 
 	let prettyLabel = $derived(capitalizeText(label));
 	let isLabelFloating = $derived(
-		isFocused || value.length > 0 || errorMessage.length > 0 || placeholder
+		s.isFocused || value.length > 0 || errorMessage.length > 0 || s.placeholder
 	);
-	let hasError = $derived(Boolean(errorMessage) && errorMessage !== commaKeyMessage);
+	let hasError = $derived(
+		Boolean(errorMessage) && errorMessage !== commaKeyMessage && errorMessage !== REFORMAT
+	);
 
 	export function reset() {
 		value = '';
-		isDirty = false;
-		isFocused = false;
+		s.isDirty = false;
+		s.isFocused = false;
 	}
 
-	function dispatchValue(triggerEvent: typeof reportOn) {
-		if (reportOn === triggerEvent && onValueChange) {
+	function dispatchValue(triggerEvent: TReportOn) {
+		if (reportOn.includes(triggerEvent) && onValueChange) {
 			onValueChange(value);
 		}
 	}
@@ -120,30 +125,31 @@
 
 		// 5. Update Svelte state
 		value = formatted;
-		isDirty = true;
+		s.isDirty = true;
 
 		// 6. Move cursor to the end of the newly formatted string
 		tick().then(() => {
 			const input = e.target as HTMLInputElement;
 			input.setSelectionRange(value.length, value.length);
 		});
-
-		dispatchValue('keyup');
+		if (reportOn.includes('paste')) {
+			dispatchValue('paste' as TReportOn);
+		}
 	}
 	function handleInput(e: Event) {
-		if (reformat) {
+		if (s.reformat) {
 			// console.log('handleInput reformat');
 			return;
 		}
-		const input = e.target as HTMLInputElement;
-		const rawValue = input.value;
-		const oldCursor = input.selectionStart || 0;
+		const el = e.target as HTMLInputElement;
+		const rawValue = el.value;
+		const oldCursor = el.selectionStart || 0;
 
 		const digitsBeforeCursor = rawValue.slice(0, oldCursor).replace(/\D/g, '').length;
 		const formatted = formatPhoneNumber(rawValue);
 
 		value = formatted;
-		if (value.length > 0) isDirty = true;
+		if (value.length > 0) s.isDirty = true;
 
 		tick().then(() => {
 			let newCursor = 0;
@@ -172,14 +178,15 @@
 				else if (digitCount < digitsBeforeCursor) newCursor = formatted.length;
 			}
 
-			input.setSelectionRange(newCursor, newCursor);
+			el.setSelectionRange(newCursor, newCursor);
 		});
-
-		dispatchValue('keyup');
+		if (reportOn.includes(e.type)) {
+			dispatchValue(e.type as TReportOn);
+		}
 	}
 
 	function handleKeyup(e: KeyboardEvent) {
-		if (reformat) {
+		if (s.reformat) {
 			// console.log('handleKeyup reformat');
 			return;
 		}
@@ -199,14 +206,14 @@
 
 		onValueChange?.(value);
 
-		if (e.key === 'Enter') {
-			dispatchValue('Enter');
+		if (reportOn.includes(e.key)) {
+			dispatchValue(e.key as TReportOn);
 		}
 	}
 	function handleKeydown(e: KeyboardEvent) {
 		const el = e.target as HTMLInputElement;
-		if (e.key === 'Enter' && reformat) {
-			reformat = '';
+		if (e.key === 'Enter' && s.reformat) {
+			s.reformat = '';
 			setCssVarColor('--cr-input-placeholder-color', 'crimson');
 			tick().then(() => {
 				return new Promise((resolve) => setTimeout(resolve, 300));
@@ -232,8 +239,8 @@
 			if ((el.selectionStart as number) <= 12) {
 				if (el.value.length > 12) {
 					// console.log('keydown inside number');
-					reformat = REFORMAT;
-					isDirty = true;
+					s.reformat = REFORMAT;
+					s.isDirty = true;
 					tick().then(() => {
 						return new Promise((resolve) => setTimeout(resolve, 300));
 					});
@@ -248,14 +255,14 @@
 			if (extIndex !== -1 && el.selectionStart === extIndex + 7) {
 				e.preventDefault();
 				value = value.slice(0, extIndex);
-				dispatchValue('keyup');
+				// dispatchValue('keyup');
 				return;
 			}
 		}
 
 		// 2. Allow Navigation / System keys
 		if (e.key.length > 1 || e.ctrlKey || e.metaKey || e.altKey) {
-			if (e.key === 'Enter') dispatchValue('Enter');
+			// if (e.key === 'Enter') dispatchValue('Enter');
 			return;
 		}
 
@@ -270,32 +277,36 @@
 		}
 	}
 
-	function handleBlur() {
+	function handleBlur(e: FocusEvent) {
 		// console.log('handleBlur');
-		isFocused = false;
-		// isDirty = true;  // at this state do not show message
+		s.isFocused = false;
+		// s.isDirty = true;  // at this state do not show message
 		if (!value) {
-			placeholder = 'Entry is required';
+			s.placeholder = 'Entry is required';
 			setCssVarColor('--cr-input-placeholder-color', 'crimson');
 		}
 		tick().then(() => {
 			return new Promise((resolve) => setTimeout(resolve, 300));
 		});
-		dispatchValue('blur');
+		if (reportOn.includes(e.type)) {
+			dispatchValue(e.type as TReportOn);
+		}
 	}
 
-	function handleFocus() {
+	function handleFocus(e: FocusEvent) {
 		// console.log('handleFocus');
-		if (placeholder) {
-			isDirty = false;
-			// console.log('still placeholder?', placeholder);
-			setCssVarColor('--cr-label-focus-color', '0066cc');
-			tick().then(() => {
-				return new Promise((resolve) => setTimeout(resolve, 300));
-			});
+		// if (s.placeholder) {
+		s.isDirty = false;
+		console.log('still placeholder?', s.placeholder);
+		setCssVarColor('--cr-label-focus-color', '0066cc');
+		tick().then(() => {
+			return new Promise((resolve) => setTimeout(resolve, 300));
+		});
+
+		s.isFocused = true;
+		if (reportOn.includes(e.type)) {
+			dispatchValue(e.type as TReportOn);
 		}
-		isFocused = true;
-		dispatchValue('focus');
 	}
 </script>
 
@@ -314,18 +325,16 @@
 			onpaste={handlePaste}
 			onblur={handleBlur}
 			onfocus={handleFocus}
-			{placeholder}
+			placeholder={s.placeholder}
 		/>
 
 		<label for="idSpan" class="floating-label" class:floating={isLabelFloating}>
-			<span id="idSpan" class="label-text">{prettyLabel}</span>
+			<span id="idSpan" class="label-text" class:floating={isLabelFloating}>
+				{prettyLabel}
+			</span>
 
 			{#if errorMessage}
-				<span
-					class="error-text"
-					title={errorMessage}
-					style:color={errorMessage.includes('press comma') ? 'green' : 'crimson'}
-				>
+				<span title={errorMessage} style:color={isGreen.test(errorMessage) ? 'green' : 'crimson'}>
 					&nbsp;{errorMessage}
 				</span>
 			{/if}

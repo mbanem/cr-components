@@ -21,6 +21,45 @@
   margin-top: 1.25rem;
 }
 
+.radio-wrapper .radio-label.isDisabled {
+  opacity: 0.6;
+  color: $cr-disabled-color;
+}
+
+.cr-input-container .radio-wrapper {
+  @include container($caption: 'Select a Product',
+    $color: navy,
+    $caption-color: navy,
+    $left: 1.7rem);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; // Allows child labels to expand to full container width
+  width: var(--cr-radio-group-width, max-content);
+  padding: 10px 0.5rem;
+  position: relative;
+  margin-top: 1.25rem;
+
+  .radio-label {
+    display: flex; // Spans full width and aligns input + text vertically
+    align-items: center;
+    gap: 0.2rem;
+    width: calc(100% + 1rem); // Extends label across container padding (0.5rem * 2)
+    margin: 0 -0.5rem; // Offsets the parent container padding
+    padding: 1px 0.5rem; // Internal padding for hover box spacing
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 15px;
+    cursor: pointer;
+
+    &:hover {
+      color: crimson;
+      background-color: cornsilk !important;
+    }
+
+  }
+
+}
+
 
 /* =========================================================
  INPUT
@@ -90,7 +129,8 @@
   /* Covers the border line behind the text */
   font-size: 0.85rem;
   opacity: 1;
-  color: $cr-label-focus-color;
+  color: green;
+  /* $cr-label-focus-color;*/
 }
 
 .cr-input-container .floating-label {
@@ -112,10 +152,14 @@
 
 .cr-input-container .label-text {
   flex-shrink: 0;
-  color: $cr-label-focus-color;
+  /*color: var(cr-color-primary);*/
+  color: $cr-input-placeholder-color;
   /* TODO this makes problem comment it out*/
 }
 
+.cr-input-container .label-text.floating {
+  color: $cr-label-focus-color;
+}
 
 /* =========================================================
  ERROR TEXT

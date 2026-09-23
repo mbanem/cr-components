@@ -8,10 +8,11 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 <nav>
-	<a href="/crinput">CRInput</a>
-	<a href="/crphone">CRPhone</a>
+	<a href="/crinput-text">CRInputText</a>
 	<a href="/phone-gemini">Phone Gemini</a>
-	<a href="/clear">Clear</a>
+	<a href="/crradio-group">CRRadioGroup</a>
+	<a href="/crcheckbox-group">CRCheckboxGroup</a>
+	<a href="/crcontext-menu">CRContextMenu</a>
 	<a href="/styling-child">Styling Child</a>
 </nav>
 {@render children()}

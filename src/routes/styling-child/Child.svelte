@@ -16,5 +16,6 @@
 		display: flex;
 		justify-content: center;
 		align-content: end;
+		padding: var(--padding);
 	}
 </style>
