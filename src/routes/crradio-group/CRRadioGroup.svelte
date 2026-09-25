@@ -1,30 +1,26 @@
-<script lang="ts" module>
-	export function capitalizeText(str: string): string {
-		return str
-			.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-			.replace(/\b\w/g, (char) => char.toUpperCase());
-	}
-</script>
-
 <script lang="ts">
+	import { onMount, tick } from 'svelte';
+
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { fade } from 'svelte/transition';
 
+	type TRadioList = { label: string; value: string; checked: boolean; isDisabled: boolean };
 	interface PROPS extends Partial<HTMLInputAttributes> {
 		caption?: string;
-		radios: TRadioGroup;
-		reportOn?: TReportOnInput;
-		value?: string;
+		radios: TChRbGroup;
+		reportOn?: TReportOn;
+		selectedValue?: string;
 		onValueChange?: TCallback;
 		disabledButtons?: string[];
 		style?: string;
+		class?: string;
 	}
 
 	let {
 		caption = '',
 		radios = {},
 		reportOn = 'change|focus|keypress',
-		value = $bindable(''),
+		selectedValue = $bindable(''),
 		onValueChange,
 		disabledButtons = $bindable(['Lila']),
 		style = '',
@@ -33,22 +29,36 @@
 		...restProps
 	}: PROPS = $props();
 
+	let timer: TTimer;
+	// as selectedValue is bound to currenly checked radio so, at rendering
+	// it will be cleared by the next loop rendering new radio so keep it and
+	// set checked when all renderings are done at onMount
+	let imgPath = '/CRRadioGroup-setup.png';
+	let selected = selectedValue;
+	let crInputContainer: HTMLDivElement;
 	let radioValue = $state(''); // from input box to find radio box by value
 	// Svelte 5 Reactive State for managing the zoomed image overlay
 	let isZoomed = $state(false);
 	// Parse radios object into a clean array, replacing empty keys with values
 	let radioList = $derived(
-		Object.entries(radios).map(([labelKey, val]) => ({
-			label: labelKey.trim() === '' ? val : labelKey,
-			value: val,
-			isDisabled: disabledButtons.includes(val)
-		}))
+		Object.entries(radios).map(([labelKey, rawVal]) => {
+			// 1. Check if rawVal is a tuple [value, checked] or a plain string value
+			const isTuple = Array.isArray(rawVal);
+			const val = isTuple ? rawVal[0] : rawVal;
+			const isChecked = isTuple ? (rawVal[1] ?? false) : false;
+			return {
+				label: labelKey.trim() === '' ? val : labelKey,
+				value: val,
+				checked: isChecked,
+				isDisabled: disabledButtons.includes(val)
+			} as TRadioList;
+		})
 	);
+	let radioValueSet = $derived(new Set(radioList.map((item) => item.value)));
 
-	let radioValueSet = $derived(new Set(Object.values(radioList).map((el) => el.value)));
 	type TRadioBundle = {
 		isFocused: boolean;
-		redios: Array<HTMLInputElement> | [];
+		radios: TChRbGroup;
 		selected: HTMLInputElement | undefined;
 	};
 	let s = $state({
@@ -57,8 +67,6 @@
 		radios: [],
 		selected: undefined
 	});
-
-	let prettyCaption = $derived(capitalizeText(caption));
 
 	export function reset() {
 		for (const radio of s.radios as HTMLInputElement[]) {
@@ -78,10 +86,11 @@
 		}
 
 		if (triggers.includes(triggerEvent)) {
-			onValueChange(value);
+			onValueChange(selectedValue);
 		}
 	}
 	function handleChange(e: Event) {
+		selectedValue = (e.target as HTMLInputElement).value;
 		if (reportOn.includes('change')) {
 			dispatchValue('change');
 		}
@@ -110,30 +119,40 @@
 		} else {
 			disabledButtons.push(radioValue);
 		}
-		console.log(disabledButtons);
 	}
+	onMount(async () => {
+		await tick();
+		const el = document.querySelector(
+			`input[type='radio'][value='${selected}']` // Removed :checked
+		) as HTMLInputElement;
+
+		if (el) el.checked = true;
+	});
 </script>
 
 <div class="grid-container">
 	<!-- Left Side: Radio Group -->
-	<div class="cr-input-container {className} {s.isDisabled ? 'disabled' : ''}">
+	<div
+		bind:this={crInputContainer}
+		class="cr-input-container {className} {s.isDisabled ? 'disabled' : ''}"
+	>
 		<div class="radio-wrapper" role="presentation">
-			{#key radioList}
-				{#each radioList as item (item.value)}
-					<label class="radio-label" class:isDisabled={item.isDisabled}>
-						<input
-							type="radio"
-							name="cr-radio-group"
-							value={item.value}
-							bind:group={value}
-							checked={value === item.value}
-							disabled={item.isDisabled}
-							onchange={handleChange}
-						/>
-						<span>{item.label}</span>
-					</label>
-				{/each}
-			{/key}
+			<!-- {#key radioList} -->
+			{#each radioList as item (item.value)}
+				<label class="radio-label" class:isDisabled={item.isDisabled}>
+					<input
+						type="radio"
+						name="cr-radio-group"
+						value={item.value}
+						bind:group={selectedValue}
+						checked={item.checked}
+						disabled={item.isDisabled}
+						onchange={handleChange}
+					/>
+					<span>{item.label}</span>
+				</label>
+			{/each}
+			<!-- {/key} -->
 		</div>
 	</div>
 
@@ -141,12 +160,17 @@
 	<div class="thumbnail-wrapper">
 		<!-- Small base thumbnail -->
 		<img
-			src="/CRIRadioGroup-instantiation.png"
+			src={imgPath}
 			alt="Instantiation code snippet summary"
 			width="100"
 			height="auto"
 			class="thumbnail-img"
-			onmouseenter={() => (isZoomed = true)}
+			onmouseenter={() => {
+				timer = setTimeout(() => {
+					isZoomed = true;
+				}, 600);
+			}}
+			onmouseleave={() => clearTimeout(timer)}
 		/>
 
 		<!-- Svelte 5 conditional render: Large overlapping image copy -->
@@ -154,7 +178,7 @@
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<img
-				src="/CRIRadioGroup-instantiation.png"
+				src={imgPath}
 				alt="Full instantiation code snippet"
 				class="overlay-img"
 				transition:fade={{ duration: 150 }}
@@ -189,7 +213,7 @@
 
 	/* Wrapper keeps the absolute overlay anchored to the second column slot */
 	.thumbnail-wrapper {
-		margin-top: 1.3rem;
+		margin-top: 0.9rem;
 		position: relative;
 		display: inline-block;
 	}

@@ -4,7 +4,6 @@
 	type TStick = 'left' | 'right' | 'above' | 'below';
 	type TPosition = { x: number; y: number };
 	type THovered = MouseEvent | HTMLElement | TPosition;
-	type TTimer = ReturnType<typeof setTimeout>;
 
 	// Svelte 5 State Trackers
 	let tooltipEl = $state<HTMLElement | undefined>(undefined);
@@ -54,7 +53,9 @@
 			const baseOrder: TStick[] = ['left', 'above', 'right', 'below'];
 			const startIdx = baseOrder.indexOf(preferredStick);
 			const reorderedSequence =
-				startIdx === -1 ? baseOrder : [...baseOrder.slice(startIdx), ...baseOrder.slice(0, startIdx)];
+				startIdx === -1
+					? baseOrder
+					: [...baseOrder.slice(startIdx), ...baseOrder.slice(0, startIdx)];
 
 			let chosenX = rect.left;
 			let chosenY = rect.bottom + gap;
@@ -118,8 +119,9 @@
 			width: 'auto',
 			padding: timeout === 0 ? '12px 32px 8px 12px;' : '12px 12px 8px 12px;',
 			// CRITICAL: Added left/top transitions for smooth tracking movement
-			transition: 'opacity 0.3s ease, left 0.2s cubic-bezier(0.25, 1, 0.5, 1), top 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
-			...userStyles,
+			transition:
+				'opacity 0.3s ease, left 0.2s cubic-bezier(0.25, 1, 0.5, 1), top 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
+			...userStyles
 		});
 	}
 
@@ -195,7 +197,7 @@
 
 			Object.assign(tooltipEl.style, {
 				position: 'fixed',
-				opacity: '0',
+				opacity: '0'
 			});
 
 			if (anchor instanceof HTMLElement) {
@@ -223,7 +225,7 @@
 					cursor: 'pointer',
 					fontSize: '14px',
 					lineHeight: '1',
-					opacity: '0.7',
+					opacity: '0.7'
 				});
 				closeBtn.onclick = (e: MouseEvent) => {
 					e.stopPropagation();

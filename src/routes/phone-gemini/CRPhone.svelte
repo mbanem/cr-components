@@ -47,9 +47,19 @@
 		isErroneous?: (val: string) => string;
 	}
 
+	// 	// ✅ Valid: Piped string formats
+	// const singleEvent: TReportOn = 'Enter';
+	// const multipleEvents: TReportOn = 'input|change|blur';
+
+	// // ✅ Valid: Array formats
+	// const arrayEvents: TReportOn = ['Enter', 'input', 'change'];
+	// const singleEventArray: TReportOn = ['blur'];
+
+	// const badString: TReportOn = 'Enter|imput|change';
+	// const badArray: TReportOn = ['Enter', 'imput', 'change'];
 	let {
 		label,
-		reportOn = 'keyup|Enter|blur',
+		reportOn = ['keyup', 'Enter', 'blur'],
 		onValueChange,
 		value = $bindable(''),
 		class: className = '',
@@ -58,6 +68,12 @@
 		...restProps
 	}: PROPS = $props();
 
+	// states for managing what CSS classes become active
+	// like label translating up/down based on  isFocused
+	// message apperance based on isDirty
+	// placehodler holding tetxt or being empty and
+	// reformat forcing special message when updating in the
+	// middle part of phone number destroying the format
 	let s = $state({
 		isFocused: false,
 		isDirty: false,
@@ -65,6 +81,7 @@
 		reformat: ''
 	});
 
+	let imgPath = '/CRRadioGroup-setup.png';
 	let errorMessage = $derived.by(() => {
 		if (!s.isDirty && !s.isFocused) return '';
 		if (value.length === 12) {
@@ -310,35 +327,69 @@
 	}
 </script>
 
-<div class={`cr-input-container ${className} ${isDisabled ? 'disabled' : ''}`}>
-	<div class="input-wrapper">
-		<input
-			type="tel"
-			class="cr-input"
-			class:has-error={hasError}
-			disabled={isDisabled}
-			{value}
-			{...restProps}
-			oninput={handleInput}
-			onkeyup={handleKeyup}
-			onkeydown={handleKeydown}
-			onpaste={handlePaste}
-			onblur={handleBlur}
-			onfocus={handleFocus}
-			placeholder={s.placeholder}
+<div class="grid-container">
+	<div class={`cr-input-container ${className} ${isDisabled ? 'disabled' : ''}`}>
+		<div class="input-wrapper">
+			<input
+				type="tel"
+				class="cr-input"
+				class:has-error={hasError}
+				disabled={isDisabled}
+				{value}
+				{...restProps}
+				oninput={handleInput}
+				onkeyup={handleKeyup}
+				onkeydown={handleKeydown}
+				onpaste={handlePaste}
+				onblur={handleBlur}
+				onfocus={handleFocus}
+				placeholder={s.placeholder}
+			/>
+
+			<label for="idSpan" class="floating-label" class:floating={isLabelFloating}>
+				<span id="idSpan" class="label-text" class:floating={isLabelFloating}>
+					{prettyLabel}
+				</span>
+
+				{#if errorMessage}
+					<span title={errorMessage} style:color={isGreen.test(errorMessage) ? 'green' : 'crimson'}>
+						&nbsp;{errorMessage}
+					</span>
+				{/if}
+			</label>
+		</div>
+	</div>
+
+	<div class="thumbnail-wrapper">
+		<!-- Small base thumbnail -->
+		<img
+			src={imgPath}
+			alt="Instantiation code snippet summary"
+			width="100"
+			height="auto"
+			class="thumbnail-img"
+			onmouseenter={() => (isZoomed = true)}
 		/>
 
-		<label for="idSpan" class="floating-label" class:floating={isLabelFloating}>
-			<span id="idSpan" class="label-text" class:floating={isLabelFloating}>
-				{prettyLabel}
-			</span>
-
-			{#if errorMessage}
-				<span title={errorMessage} style:color={isGreen.test(errorMessage) ? 'green' : 'crimson'}>
-					&nbsp;{errorMessage}
-				</span>
-			{/if}
-		</label>
+		<!-- Svelte 5 conditional render: Large overlapping image copy -->
+		{#if isZoomed}
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+			<img
+				src={imgPath}
+				alt="Full instantiation code snippet"
+				class="overlay-img"
+				transition:fade={{ duration: 150 }}
+			/>
+			<div class="hitbox-mask" onmouseleave={() => (isZoomed = false)} aria-hidden={true}></div>
+		{/if}
+	</div>
+	<div class="below">
+		<input type="text" bind:value={checkboxValue} placeholder="Checkbox value string" />
+		<button onclick={disableCheckbox}>toggle disabled by name</button>
+		<pre>At child. Disabled radio buttons
+{JSON.stringify(disabledButtons, null, 2)}
+</pre>
 	</div>
 </div>
 

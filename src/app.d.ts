@@ -2,12 +2,22 @@
 // for information about these interfaces
 declare global {
 
-	export type TReportOn = 'Enter' | 'input' | 'change' | 'keyup' | 'keypress' | 'keydown' | 'blur' | 'focus' | 'paste';
+	export type TSingleReportOn = 'Enter' | 'input' | 'change' | 'keyup' | 'keypress' | 'keydown' | 'blur' | 'focus' | 'paste';
+	export type TReportOnUnion<T extends string = TSingleReportOn> =
+		| T
+		| `${T}|${T}`
+		| `${T}|${T}|${T}`
+	export type TReportOn = TReportOnUnion | TSingleReportOn[];
+
 	// Allows single triggers, pipe-separated triggers (e.g. "paste|keyup|Enter"), or arrays
-	export type TReportOnInput = TReportOn | (string & {}) | TReportOn[];
+	// export type TReportOnInput = TReportOn | (string & {}) | TReportOn[];
+
 	export type TCallback = (value: string) => void;
 
-	export type TRadioGroup = Record<string, string>
+	type TTimer = ReturnType<typeof setTimeout>;
+	export type TRCValue = [value: string, checked?: boolean]
+	export type TChRbGroup = Record<string, string | TCRValue>
+	export type TCheckboxGroup = string[]
 
 	interface String {
 		/**
