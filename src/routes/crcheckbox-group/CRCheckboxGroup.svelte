@@ -4,7 +4,6 @@
 	import { fade } from 'svelte/transition';
 	import type { TCheckboxItem, TEntryMap } from './types';
 
-	const log = console.log;
 	type Props = {
 		caption?: string;
 		checkboxes: TEntryMap;
@@ -32,30 +31,52 @@
 	let imgPath = '/CRCheckboxGroup-setup.png';
 	let timer: ReturnType<typeof setTimeout>;
 	let checkboxValue = $state('');
-	let labelForCheckbox = $state('Vanilla Ice Cream Crougger');
-	let valueForCheckbox = $state('Ice Cream-V Crougger');
+	let labelForCheckbox = $state('');
+	let valueForCheckbox = $state('');
 	let selectedForCheckbox = $state(false);
 	let isZoomed = $state(false);
 
-	// 1. One-time or prop-change initialization into SvelteMap
+	// 1. Initialize & sync items from 'checkboxes' prop into itemMap without wiping existing proxies
 	$effect(() => {
-		checkboxes;
+		// Only track the 'checkboxes' prop explicitly
+		const entries = Array.from(checkboxes);
+
 		untrack(() => {
-			itemMap.clear();
-			for (const [label, val] of checkboxes) {
+			const currentKeys = new Set<string>();
+
+			for (const [label, val] of entries) {
 				const value = Array.isArray(val) ? val[0] : val;
 				const explicitDisabled = Array.isArray(val) ? val[1] : false;
+				currentKeys.add(value);
 
-				itemMap.set(value, {
-					label,
-					selected: selectedCheckButtons.has(value),
-					disabled: explicitDisabled || disabledButtons.has(value)
-				});
+				const initialChecked = selectedCheckButtons.has(value);
+				const initialDisabled = explicitDisabled || disabledButtons.has(value);
+
+				if (itemMap.has(value)) {
+					// Update existing proxy properties
+					const existing = itemMap.get(value)!;
+					existing.label = label;
+				} else {
+					// Create a new $state reactive proxy
+					let itemState = $state({
+						label,
+						selected: initialChecked,
+						disabled: initialDisabled
+					});
+					itemMap.set(value, itemState);
+				}
+			}
+
+			// Cleanup removed items
+			for (const key of Array.from(itemMap.keys())) {
+				if (!currentKeys.has(key)) {
+					itemMap.delete(key);
+				}
 			}
 		});
 	});
 
-	// 2. Synchronize itemMap changes outwards to selectedCheckButtons & disabledButtons
+	// 2. Synchronize itemMap selection & disabled state outwards to Parent Sets
 	$effect(() => {
 		const currentSelected = new Set<string>();
 		const currentDisabled = new Set<string>();
@@ -78,109 +99,46 @@
 		});
 	});
 
-	// 3. React to parent set updates (External -> Local Map)
-	$effect(() => {
-		for (const [value, item] of itemMap.entries()) {
-			const shouldBeSelected = selectedCheckButtons.has(value);
-			if (item.selected !== shouldBeSelected) {
-				item.selected = shouldBeSelected;
-			}
-		}
-	});
-
-	$effect(() => {
-		for (const [value, item] of itemMap.entries()) {
-			const shouldBeDisabled = disabledButtons.has(value);
-			if (item.disabled !== shouldBeDisabled) {
-				item.disabled = shouldBeDisabled;
-			}
-		}
-	});
-
+	// 3. Dynamic derived set for lookup validations
 	let validValues = $derived(new SvelteSet(itemMap.keys()));
 
-	// Event handlers & Clean State Actions
-	function handleCheckboxChange(value: string) {
-		if (selectedCheckButtons.has(value)) {
-			selectedCheckButtons.delete(value);
-		} else {
-			selectedCheckButtons.add(value);
-		}
-		if (reportOn === 'change') {
-			onValueChange?.(selectedCheckButtons);
-		}
-	}
-
+	// Handlers
 	function toggleDisabledByValue() {
 		if (!validValues.has(checkboxValue)) {
 			console.warn('Value matching key not found in Registry:', checkboxValue);
 			return;
 		}
-		log('found in validValues', checkboxValue, validValues);
 		const item = itemMap.get(checkboxValue);
-		log('is item found?', item);
 		if (item) {
-			itemMap.set(checkboxValue, {
-				...item,
-				disabled: !item.disabled
-			});
-		}
-		log('now is disabled?', item?.disabled);
-	}
-
-	export function reset() {
-		for (const item of itemMap.values()) {
-			item.selected = false;
+			item.disabled = !item.disabled;
 		}
 	}
 
-	export function invertSelections() {
-		for (const item of itemMap.values()) {
-			if (!item.disabled) {
-				item.selected = !item.selected;
-			}
-		}
-	}
-
-	// Vanilla Ice Cream Crougger  Ice Cream-V Crougger
-	// Fully Declarative Add/Remove
 	export function addItem(label: string, value: string, selected = false) {
 		if (itemMap.has(value)) {
 			removeItemByValue(value);
 			return;
 		}
-		// Svelte 5 SvelteMap triggers UI updates automatically on .set()
-		itemMap.set(value, { label, selected, disabled: false });
+		let newItem = $state({ label, selected, disabled: false });
+		itemMap.set(value, newItem);
 	}
 
 	export function removeItemByValue(value: string) {
-		// Standard map delete triggers template #each re-render cleanly
 		itemMap.delete(value);
-		if (selectedCheckButtons.has(value)) {
-			selectedCheckButtons.delete(value);
-		}
 	}
 
 	export function toggleCheckListByValue() {
 		if (!labelForCheckbox || !valueForCheckbox) return;
 		addItem(labelForCheckbox, valueForCheckbox, selectedForCheckbox);
 	}
-	// const caption = 'Ah a new caption';
 </script>
 
 <div class="grid-container">
-	<!-- Left Side: Checkbox Group -->
-	<div class="cr-input-container {className}" {style} data-caption={caption ?? 'Select a Product'}>
+	<div class="cr-input-container {className}" {style} data-caption={caption}>
 		<div class="radio-wrapper" role="presentation">
 			{#each Array.from(itemMap.entries()) as [value, item] (value)}
 				<label class="checkbox-label">
-					<input
-						type="checkbox"
-						{value}
-						bind:checked={item.selected}
-						disabled={item.disabled}
-						onchange={() => handleCheckboxChange(value)}
-					/>
+					<input type="checkbox" {value} bind:checked={item.selected} disabled={item.disabled} />
 					<span class:item-disabled={item.disabled}>{item.label}</span>
 				</label>
 			{/each}
@@ -200,7 +158,6 @@
 					isZoomed = true;
 				}, 600);
 			}}
-			onmouseleave={() => clearTimeout(timer)}
 		/>
 
 		{#if isZoomed}
@@ -223,7 +180,7 @@
 			placeholder="Radio value string"
 			style="width:12.2rem !important;"
 		/>
-		<button onclick={toggleDisabledByValue}>Toggle disabled by checklist value</button>
+		<button onclick={toggleDisabledByValue}> Toggle disabled by checklist value </button>
 		<pre>At child. Number of disabled checkbox buttons: {disabledButtons.size}</pre>
 		<div class="wrapper">
 			<div class="single-row">
@@ -268,13 +225,13 @@
 	.cr-input-container {
 		@include container();
 		width: 30.8rem;
-		padding: 10px;
-		padding-top: 1px;
-		margin-top: 1rem;
 		.radio-wrapper {
-			width: 22rem;
+			width: 22.4rem;
 		}
+		padding: 0 0 10px 1rem;
+		margin-top: 1rem;
 	}
+
 	.wrapper {
 		@include container($caption: 'Add new or Remove Checkbox from the List', $caption-color: navy);
 		padding: 10px 6px;
@@ -312,7 +269,7 @@
 		margin-top: 10px;
 	}
 	.thumbnail-wrapper {
-		margin: 2.4rem 0 0 3.4rem;
+		margin-top: 1.3rem;
 		position: relative;
 		display: inline-block;
 	}
@@ -321,16 +278,18 @@
 		text-decoration: line-through;
 	}
 	.thumbnail-img {
+		margin: 1.1rem 0 0 4rem;
 		cursor: zoom-in;
 		display: block;
 	}
 	%overlay-dimensions {
 		position: absolute;
 		top: 0px;
-		left: -360px;
-		width: 460px;
+		left: -314px;
+		width: 479px;
 		height: auto;
 		aspect-ratio: 400 / 300;
+		border-radius: 8px;
 	}
 	.overlay-img {
 		@extend %overlay-dimensions;

@@ -31,7 +31,8 @@
 	// Example: Remote function to mutate child state from the parent code
 	function remotelyToggleCheckbox() {
 		const pn = itemMap.get('Pumpernickel');
-
+		if (pn) {
+		}
 		// ✅ Guard: Only toggle selection if the checkbox exists AND is NOT currently disabled
 		if (pn && !pn.disabled) {
 			pn.selected = !pn.selected;

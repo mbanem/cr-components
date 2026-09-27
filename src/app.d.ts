@@ -12,6 +12,7 @@ declare global {
 	// Allows single triggers, pipe-separated triggers (e.g. "paste|keyup|Enter"), or arrays
 	// export type TReportOnInput = TReportOn | (string & {}) | TReportOn[];
 
+	export const log = console.log
 	export type TCallback = (value: string) => void;
 
 	type TTimer = ReturnType<typeof setTimeout>;
