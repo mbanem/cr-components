@@ -57,7 +57,7 @@ $cr-label-focus-color: #0066cc;
 
 $cr-label-background: white;
 
-:global(.light) {
+:global(:root) {
   --disabled-color: gray;
   --attr-id: #008000;
   --badge-color: #000080;

@@ -1,11 +1,18 @@
 <script lang="ts">
-	import { tick } from 'svelte';
 	import { SvelteSet, SvelteMap } from 'svelte/reactivity';
 	import CRCheckboxGroup from './CRCheckboxGroup.svelte';
-	import type { CheckboxItem } from './types';
+	import type { TCheckboxItem, TEntryValue, TEntryMap } from './types';
 
+	// Reactive entry list in Svelte 5
+	let entryMap: TEntryMap = new SvelteMap<string, TEntryValue>([
+		['German bred Pumpernickel', 'Pumpernickel'],
+		["Hershey's Chocolate Milk", 'Hershey'],
+		['Brasilian French-Roast Coffee Melitta', 'Melitta'],
+		['Milka Chocolate Lila', ['Lila', true]],
+		['Dove Soap Original Beauty Bar', 'Original Beauty Bar']
+	]);
 	// will be built by child component based on the sent checkboxes prop
-	let itemMap = new SvelteMap<string, CheckboxItem>();
+	let itemMap = new SvelteMap<string, TCheckboxItem>();
 	// ✅ Create a variable to reference the child component instance
 	let checkboxGroupComponent: ReturnType<typeof CRCheckboxGroup>;
 
@@ -18,11 +25,8 @@
 		// Call the exported child method
 		checkboxGroupComponent?.invertSelections();
 	}
-	async function onValueChange(val: SvelteSet<string>) {
-		// console.log('parent onValueChange:', val.size);
-		await tick();
+	function onValueChange(val: SvelteSet<string>) {
 		selectedCheckButtons = val;
-		// console.log('onValueChange', val);
 	}
 	// Example: Remote function to mutate child state from the parent code
 	function remotelyToggleCheckbox() {
@@ -47,18 +51,21 @@
 	let disabledButtons = new SvelteSet<string>(['Hershey']);
 </script>
 
+<div class="controls">
+	<p>selectedCheckButtons at parent <span style="color:red;">{selectedCheckButtons.size}</span></p>
+	<p>disabledButtons at parent <span style="color:red;">{disabledButtons.size}</span></p>
+	<br />
+	<button onclick={remotelyToggleCheckbox}>Toggle Pumpernickel From Parent</button>
+	<button onclick={remotelyDisableCoffee}>Toggle Disable Melitta From Parent</button>
+</div>
 <div style="max-width: 18rem; padding: 6px 1rem;">
 	<CRCheckboxGroup
 		caption="Select Products"
-		checkboxes={{
-			'German bred Pumpernickel': 'Pumpernickel',
-			"Hershey's Chocolate Milk": 'Hershey',
-			'Brasilian French-Roast Coffee Melitta': 'Melitta',
-			'Milka Chocolate Lila': ['Lila', true],
-			'Dove Soap Original Beauty Bar': 'Original Beauty Bar'
-		}}
+		// goes into @mixin container caption arg
+		checkboxes={entryMap}
 		reportOn="change"
 		{onValueChange}
+		// bind CRCheckboxGrpup instance to call exported child functions
 		bind:this={checkboxGroupComponent}
 		bind:selectedCheckButtons
 		bind:disabledButtons
@@ -68,12 +75,6 @@
 	/>
 </div>
 
-<p>selectedCheckButtons at parent <span style="color:red;">{selectedCheckButtons.size}</span></p>
-<p>disabledButtons at parent <span style="color:red;">{disabledButtons.size}</span></p>
-<div class="controls">
-	<button onclick={remotelyToggleCheckbox}>Toggle Pumpernickel From Parent</button>
-	<button onclick={remotelyDisableCoffee}>Toggle Disable Melitta From Parent</button>
-</div>
 <div style="margin: 0.5rem 0 0 1rem;">
 	At parent. Selecteded Products
 	{#each Array.from(selectedCheckButtons.keys()) as product (product)}
@@ -95,6 +96,6 @@
 	}
 	.controls {
 		padding: 0;
-		margin: 0;
+		margin: 1rem 0 0 1rem;
 	}
 </style>

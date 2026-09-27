@@ -16,22 +16,36 @@
 // 		}
 // 	}
 // });
+// import { sveltekit } from '@sveltejs/kit/vite';
+// import { defineConfig } from 'vite';
+// import { fileURLToPath } from 'url';
+// import path from 'path';
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// export default defineConfig({
+// 	plugins: [sveltekit()],
+// 	css: {
+// 		preprocessorOptions: {
+// 			scss: {
+// 				// Safely resolve the absolute path to your styles folder
+// 				loadPaths: [path.resolve(__dirname, './src/styles')],
+// 				additionalData: `@use "variables.scss" as *;`
+// 			}
+// 		}
+// 	}
+// });
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export default defineConfig({
 	plugins: [sveltekit()],
 	css: {
 		preprocessorOptions: {
 			scss: {
-				// Safely resolve the absolute path to your styles folder
-				loadPaths: [path.resolve(__dirname, './src/styles')],
-				additionalData: `@use "variables.scss" as *;`
+				// Automatically injects mixins & variables into every Svelte component
+				additionalData: `@use "$styles/index.scss" as *;`
 			}
 		}
 	}
