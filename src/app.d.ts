@@ -2,6 +2,8 @@
 // for information about these interfaces
 declare global {
 
+	const log: typeof console.log;
+	export type TComponentType = 'RadioGroip' | 'CheckboxGroup'
 	export type TSingleReportOn = 'Enter' | 'input' | 'change' | 'keyup' | 'keypress' | 'keydown' | 'blur' | 'focus' | 'paste';
 	export type TReportOnUnion<T extends string = TSingleReportOn> =
 		| T
@@ -12,7 +14,6 @@ declare global {
 	// Allows single triggers, pipe-separated triggers (e.g. "paste|keyup|Enter"), or arrays
 	// export type TReportOnInput = TReportOn | (string & {}) | TReportOn[];
 
-	export const log = console.log
 	export type TCallback = (value: string) => void;
 
 	type TTimer = ReturnType<typeof setTimeout>;

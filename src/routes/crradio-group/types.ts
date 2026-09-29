@@ -1,5 +1,5 @@
-import { SvelteMap } from 'svelte/reactivity';
-export type TCheckboxItem = {
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+export type TChRbItem = {
   label: string;
   selected: boolean;
   disabled: boolean;

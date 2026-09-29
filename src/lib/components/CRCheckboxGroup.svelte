@@ -1,17 +1,18 @@
 <script lang="ts">
+	// WORKS WELL
 	import { untrack } from 'svelte';
 	import { SvelteSet, SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
-	import type { TCheckboxItem, TEntryMap } from './types';
+	import type { TBoxItem, TEntryMap, value } from '$lib/types';
 
 	type Props = {
 		caption?: string;
 		checkboxes: TEntryMap;
-		selectedCheckButtons: SvelteSet<string>;
+		selectedButtons: SvelteSet<string>;
 		disabledButtons?: SvelteSet<string>;
 		reportOn?: 'change' | 'input';
 		onValueChange?: (val: SvelteSet<string>) => void;
-		itemMap?: SvelteMap<string, TCheckboxItem>;
+		itemMap?: SvelteMap<value, TBoxItem>;
 		style?: string;
 		class?: string;
 	};
@@ -20,10 +21,10 @@
 		caption,
 		checkboxes,
 		reportOn = 'change',
-		selectedCheckButtons = $bindable(),
-		disabledButtons = $bindable(new SvelteSet()),
+		selectedButtons = $bindable(),
+		disabledButtons = $bindable<SvelteSet<string>>(), // set generic type to avoid undefined
 		onValueChange,
-		itemMap = $bindable(new SvelteMap()),
+		itemMap = $bindable<SvelteMap<value, TBoxItem>>(), // set generic type to avoid undefined
 		style = '',
 		class: className = ''
 	}: Props = $props();
@@ -31,25 +32,24 @@
 	let imgPath = '/CRCheckboxGroup-setup.png';
 	let timer: ReturnType<typeof setTimeout>;
 	let checkboxValue = $state('');
-	let labelForCheckbox = $state('');
-	let valueForCheckbox = $state('');
+	let labelForCheckbox = $state('Vanilla Ice Cream Crougger');
+	let valueForCheckbox = $state('Ice Cream-V Crougger');
 	let selectedForCheckbox = $state(false);
 	let isZoomed = $state(false);
 
-	// 1. Initialize & sync items from 'checkboxes' prop into itemMap without wiping existing proxies
 	$effect(() => {
 		// Only track the 'checkboxes' prop explicitly
-		const entries = Array.from(checkboxes);
+		const boxes = Array.from(checkboxes);
 
 		untrack(() => {
 			const currentKeys = new Set<string>();
 
-			for (const [label, val] of entries) {
+			for (const [label, val] of boxes) {
 				const value = Array.isArray(val) ? val[0] : val;
 				const explicitDisabled = Array.isArray(val) ? val[1] : false;
 				currentKeys.add(value);
 
-				const initialChecked = selectedCheckButtons.has(value);
+				const initialChecked = selectedButtons.has(value);
 				const initialDisabled = explicitDisabled || disabledButtons.has(value);
 
 				if (itemMap.has(value)) {
@@ -87,22 +87,31 @@
 		}
 
 		untrack(() => {
-			selectedCheckButtons.clear();
-			currentSelected.forEach((v) => selectedCheckButtons.add(v));
+			selectedButtons.clear();
+			currentSelected.forEach((v) => selectedButtons.add(v));
 
 			disabledButtons.clear();
 			currentDisabled.forEach((v) => disabledButtons.add(v));
 
 			if (reportOn === 'change') {
-				onValueChange?.(selectedCheckButtons);
+				onValueChange?.(selectedButtons);
 			}
 		});
 	});
 
-	// 3. Dynamic derived set for lookup validations
 	let validValues = $derived(new SvelteSet(itemMap.keys()));
 
 	// Handlers
+
+	export function reset() {
+		for (const [key, val] of Array.from(itemMap.entries())) {
+			if (val.selected) {
+				const state = $state({ ...val, selected: false });
+				itemMap.set(key, state);
+			}
+		}
+	}
+
 	function toggleDisabledByValue() {
 		if (!validValues.has(checkboxValue)) {
 			console.warn('Value matching key not found in Registry:', checkboxValue);
@@ -114,6 +123,10 @@
 		}
 	}
 
+	export function removeItemByValue(value: string) {
+		itemMap.delete(value);
+	}
+
 	export function addItem(label: string, value: string, selected = false) {
 		if (itemMap.has(value)) {
 			removeItemByValue(value);
@@ -123,8 +136,12 @@
 		itemMap.set(value, newItem);
 	}
 
-	export function removeItemByValue(value: string) {
-		itemMap.delete(value);
+	export function invertSelections() {
+		for (const [key, val] of Array.from(itemMap.entries())) {
+			const selected = !val.selected;
+			const state = $state({ ...val, selected });
+			itemMap.set(key, state);
+		}
 	}
 
 	export function toggleCheckListByValue() {
@@ -158,6 +175,7 @@
 					isZoomed = true;
 				}, 600);
 			}}
+			onmouseleave={() => clearTimeout(timer)}
 		/>
 
 		{#if isZoomed}

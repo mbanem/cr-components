@@ -2,6 +2,8 @@
 	import favicon from '$lib/assets/favicon.svg';
 	let { children } = $props();
 	import '$styles/components.scss';
+	// src/hooks.client.ts
+	(globalThis as typeof globalThis & { log: typeof console.log }).log = console.log;
 </script>
 
 <svelte:head>
