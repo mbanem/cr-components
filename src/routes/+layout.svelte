@@ -16,6 +16,7 @@
 	<a href="/crcheckbox-group">CRCheckboxGroup</a>
 	<a href="/crcontext-menu">CRContextMenu</a>
 	<a href="/styling-child">Styling Child</a>
+	<a href="/test-page">Test Page</a>
 </nav>
 {@render children()}
 

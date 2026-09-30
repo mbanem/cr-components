@@ -35,6 +35,7 @@
 
 <script lang="ts">
 	import { tick } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { setCssVarColor } from '$lib/utils/client-helpers';
 
@@ -59,7 +60,7 @@
 	// const badArray: TReportOn = ['Enter', 'imput', 'change'];
 	let {
 		label,
-		reportOn = ['keyup', 'Enter', 'blur'],
+		reportOn = 'keyup|Enter|blur', //['keyup', 'Enter', 'blur'],
 		onValueChange,
 		value = $bindable(''),
 		class: className = '',
@@ -82,6 +83,8 @@
 	});
 
 	let imgPath = '/CRRadioGroup-setup.png';
+	let timer: ReturnType<typeof setTimeout>;
+	let isZoomed = $state(false);
 	let errorMessage = $derived.by(() => {
 		if (!s.isDirty && !s.isFocused) return '';
 		if (value.length === 12) {
@@ -108,7 +111,7 @@
 	}
 
 	function dispatchValue(triggerEvent: TReportOn) {
-		if (reportOn.includes(triggerEvent) && onValueChange) {
+		if (reportOn.includes(triggerEvent as TSingleReportOn) && onValueChange) {
 			onValueChange(value);
 		}
 	}
@@ -197,7 +200,7 @@
 
 			el.setSelectionRange(newCursor, newCursor);
 		});
-		if (reportOn.includes(e.type)) {
+		if (reportOn.includes(e.type as TSingleReportOn)) {
 			dispatchValue(e.type as TReportOn);
 		}
 	}
@@ -223,8 +226,8 @@
 
 		onValueChange?.(value);
 
-		if (reportOn.includes(e.key)) {
-			dispatchValue(e.key as TReportOn);
+		if (reportOn.includes(e.key as TSingleReportOn)) {
+			dispatchValue(e.key as TSingleReportOn);
 		}
 	}
 	function handleKeydown(e: KeyboardEvent) {
@@ -305,7 +308,7 @@
 		tick().then(() => {
 			return new Promise((resolve) => setTimeout(resolve, 300));
 		});
-		if (reportOn.includes(e.type)) {
+		if (reportOn.includes(e.type as TSingleReportOn)) {
 			dispatchValue(e.type as TReportOn);
 		}
 	}
@@ -314,16 +317,16 @@
 		// console.log('handleFocus');
 		// if (s.placeholder) {
 		s.isDirty = false;
-		console.log('still placeholder?', s.placeholder);
 		setCssVarColor('--cr-label-focus-color', '0066cc');
 		tick().then(() => {
 			return new Promise((resolve) => setTimeout(resolve, 300));
 		});
 
 		s.isFocused = true;
-		if (reportOn.includes(e.type)) {
+		if (reportOn.includes(e.type as TSingleReportOn)) {
 			dispatchValue(e.type as TReportOn);
 		}
+		log('fandleFocus isDirty?', s.isDirty);
 	}
 </script>
 
@@ -361,40 +364,72 @@
 	</div>
 
 	<div class="thumbnail-wrapper">
-		<!-- Small base thumbnail -->
 		<img
 			src={imgPath}
 			alt="Instantiation code snippet summary"
 			width="100"
 			height="auto"
 			class="thumbnail-img"
-			onmouseenter={() => (isZoomed = true)}
+			onmouseenter={() => {
+				timer = setTimeout(() => {
+					isZoomed = true;
+				}, 600);
+			}}
+			onmouseleave={() => clearTimeout(timer)}
 		/>
 
-		<!-- Svelte 5 conditional render: Large overlapping image copy -->
 		{#if isZoomed}
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<img
 				src={imgPath}
 				alt="Full instantiation code snippet"
 				class="overlay-img"
-				transition:fade={{ duration: 150 }}
+				transition:fade={{ duration: 250 }}
 			/>
 			<div class="hitbox-mask" onmouseleave={() => (isZoomed = false)} aria-hidden={true}></div>
 		{/if}
-	</div>
-	<div class="below">
-		<input type="text" bind:value={checkboxValue} placeholder="Checkbox value string" />
-		<button onclick={disableCheckbox}>toggle disabled by name</button>
-		<pre>At child. Disabled radio buttons
-{JSON.stringify(disabledButtons, null, 2)}
-</pre>
 	</div>
 </div>
 
 <style lang="scss">
 	input::placeholder {
 		color: var(--cr-input-placeholder-color);
+	}
+	.thumbnail-wrapper {
+		margin-top: 1.3rem;
+		position: relative;
+		display: inline-block;
+	}
+	.item-disabled {
+		color: gray;
+		text-decoration: line-through;
+	}
+	.thumbnail-img {
+		margin: 1.1rem 0 0 4rem;
+		border-radius: 3px;
+		cursor: zoom-in;
+		display: block;
+	}
+	%overlay-dimensions {
+		position: absolute;
+		top: 0px;
+		left: -314px;
+		width: 479px;
+		height: auto;
+		aspect-ratio: 400 / 300;
+		border-radius: 8px;
+	}
+	.overlay-img {
+		@extend %overlay-dimensions;
+		z-index: 100;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+		border: 1px solid #ccc;
+		background-color: #1e1e1e;
+	}
+	.hitbox-mask {
+		@extend %overlay-dimensions;
+		z-index: 101;
+		background: transparent;
+		cursor: zoom-out;
 	}
 </style>

@@ -1,3 +1,13 @@
+export function capitalize(str: string): string {
+  return (
+    str
+      // Insert space before capital letters and lowercase letters following digits
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      // Capitalize the first letter of every word
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+  );
+}
+
 export const setTextColor = (varName: string, color: string) => {
   try {
     if (document) {

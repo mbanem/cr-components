@@ -323,6 +323,7 @@
     }
     .thumbnail-img {
         margin: 1.1rem 0 0 4rem;
+        border-radius: 3px;
         cursor: zoom-in;
         display: block;
     }
