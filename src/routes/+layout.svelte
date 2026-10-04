@@ -16,7 +16,10 @@
 	<a href="/crcheckbox-group">CRCheckboxGroup</a>
 	<a href="/crcontext-menu">CRContextMenu</a>
 	<a href="/styling-child">Styling Child</a>
+	<a href="/t-css-vars-from-markup">Markup css var</a>
 	<a href="/test-page">Test Page</a>
+	<a href="/tooltip">Reactive Tooltip</a>
+	<a href="/tooltip-grok">Reactive Grok Tooltip</a>
 </nav>
 {@render children()}
 

@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { type Snippet } from 'svelte';
+	import { type Snippet, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import HoverableDetails from '$lib/components/HoverableDetails.svelte';
+
 	let cbGroup = $state('');
 	let logGroups = $state([
 		{ id: 1, title: 'Gemini 1', lines: ['line1', 'line2'], status: 'active', active: true },
@@ -719,5 +720,12 @@ Package Manager e.g. pnpm.
 		align-items: baseline;
 		padding: 0;
 		margin: 0;
+	}
+	.buttons-wrapper {
+		button {
+			width: 11rem;
+			height: 3rem;
+			margin: 10rem 0 0 0.5rem;
+		}
 	}
 </style>

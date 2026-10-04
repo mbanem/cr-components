@@ -2,12 +2,11 @@
 	import { tick } from 'svelte';
 
 	type TStick = 'left' | 'right' | 'above' | 'below';
-	type TPosition = { x: number; y: number };
-	type THovered = MouseEvent | HTMLElement | TPosition;
+	type THovered = MouseEvent | HTMLElement;
 
 	// Svelte 5 State Trackers
 	let tooltipEl = $state<HTMLElement | undefined>(undefined);
-	let anchorRect = $state<DOMRect | TPosition | undefined>(undefined);
+	let anchorRect = $state<DOMRect | undefined>(undefined);
 	let preferredStick = $state<TStick>('above');
 	let userStyles = $state<Record<string, string>>({});
 	let timeout = $state(3000);
@@ -163,7 +162,7 @@
 		tooltip: HTMLElement | string,
 		timeout_: number = 3000,
 		stick: TStick = 'above',
-		customStyles: Record<string, string> = {},
+		userStyles: Record<string, string> = {},
 		callbackOnClose?: () => void
 	) {
 		try {
@@ -179,7 +178,7 @@
 			if (tooltipEl !== undefined) return;
 
 			preferredStick = stick;
-			userStyles = customStyles;
+			userStyles = userStyles;
 
 			if (typeof tooltip === 'string') {
 				tooltipEl = document.createElement('div');
@@ -208,8 +207,6 @@
 					anchorRect = el.getBoundingClientRect();
 					// }
 				}
-			} else {
-				anchorRect = anchor as TPosition;
 			}
 
 			if (timeout === 0) {

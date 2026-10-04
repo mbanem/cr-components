@@ -16,7 +16,7 @@
 		return tooltipEl !== undefined;
 	}
 
-	async function fadeOutAndRemove(el: HTMLElement) {
+	export async function fadeOutAndRemove(el: HTMLElement) {
 		el.style.opacity = '0';
 		await new Promise((resolve) => setTimeout(resolve, 300));
 		await tick();
@@ -46,7 +46,9 @@
 			const baseOrder: TStick[] = ['left', 'above', 'right', 'below'];
 			const startIdx = baseOrder.indexOf(preferredStick);
 			const reorderedSequence =
-				startIdx === -1 ? baseOrder : [...baseOrder.slice(startIdx), ...baseOrder.slice(0, startIdx)];
+				startIdx === -1
+					? baseOrder
+					: [...baseOrder.slice(startIdx), ...baseOrder.slice(0, startIdx)];
 
 			let chosenX = rect.left;
 			let chosenY = rect.bottom + gap;
@@ -110,8 +112,9 @@
 			width: 'auto',
 			padding: timeout === 0 ? '12px 26px 8px 12px' : '12px 12px 8px 12px',
 			// CRITICAL: Added left/top transitions for smooth tracking movement
-			transition: 'opacity 0.3s ease, left 0.2s cubic-bezier(0.25, 1, 0.5, 1), top 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
-			...userStyles,
+			transition:
+				'opacity 0.3s ease, left 0.2s cubic-bezier(0.25, 1, 0.5, 1), top 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
+			...userStyles
 		});
 	}
 
@@ -148,7 +151,7 @@
 		tooltip: HTMLElement | string,
 		timeout_: number = 3000,
 		stick: TStick = 'above',
-		customStyles: Record<string, string> = {}
+		userStyles: Record<string, string> = {}
 	) {
 		try {
 			timeout = timeout_;
@@ -156,7 +159,7 @@
 
 			// Store configurations into reactive state blocks
 			preferredStick = stick;
-			userStyles = customStyles;
+			userStyles = userStyles;
 
 			if (typeof tooltip === 'string') {
 				tooltipEl = document.createElement('div');
@@ -173,7 +176,7 @@
 
 			Object.assign(tooltipEl.style, {
 				position: 'fixed',
-				opacity: '0',
+				opacity: '0'
 			});
 
 			// Resolve & tag the anchor element so the scroll listener can track it
@@ -208,13 +211,15 @@
 					fontSize: '13px',
 					padding: '0',
 					lineHeight: '1',
-					opacity: '0.7',
+					opacity: '0.7'
 				});
 
 				closeBtn.onclick = (e: MouseEvent) => {
 					e.stopPropagation();
 					// Cleanup our temporary anchor tag class on close
-					document.querySelector('.dynamic-tooltip-anchor')?.classList.remove('dynamic-tooltip-anchor');
+					document
+						.querySelector('.dynamic-tooltip-anchor')
+						?.classList.remove('dynamic-tooltip-anchor');
 					if (tooltipEl) fadeOutAndRemove(tooltipEl);
 				};
 				tooltipEl.offsetHeight; // reflow
@@ -231,7 +236,9 @@
 
 			if (timeout > 0) {
 				setTimeout(() => {
-					document.querySelector('.dynamic-tooltip-anchor')?.classList.remove('dynamic-tooltip-anchor');
+					document
+						.querySelector('.dynamic-tooltip-anchor')
+						?.classList.remove('dynamic-tooltip-anchor');
 					if (tooltipEl) fadeOutAndRemove(tooltipEl);
 				}, timeout);
 			}

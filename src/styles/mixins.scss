@@ -170,3 +170,11 @@
   font-size: 0.9rem;
   font-weight: 400;
 }
+
+@mixin div($width: max-content, $padding: 0.5rem 1rem, $height: 4rem, $border: 1px solid gray, $border-raduis: 8px) {
+  width: $width;
+  padding: $padding;
+  height: $height;
+  border: $border;
+  border-radius: $border-raduis;
+}
