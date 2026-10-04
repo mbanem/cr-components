@@ -1,12 +1,13 @@
-import type { TStick, TLaunchEvent, TUserStyles, TShow, THide, TOnClose, THovered } from '$lib/types/tooltip-args'
+import type { TStick, TUserStyles, TShow, THide, TOnClose, THovered } from '$lib/types/tooltip-args'
 import { setupEventHandlers } from '$lib/utils/setupEventHandlers';
+import { tick } from 'svelte';
 
 export interface ITooltipOptions {
   anchor: THovered;
   content: HTMLElement | string;
   timeout: number
   showOn: TShow;
-  hideOn: THide
+  hideOn?: THide
   stick?: TStick;
   userStyles?: TUserStyles;
   onClose?: TOnClose;
@@ -19,9 +20,9 @@ export class CRReactiveTooltip {
   private anchorRect: DOMRect | undefined;
   public stick: TStick = 'above';
   public showOn: TShow = 'click';
-  public hideOn: THide = 'mouseleave';
-  public userStyles: TUserStyles = {};
+  public hideOn?: THide = 'mouseleave';
   public timeout = 3000;
+  public userStyles: TUserStyles = {};
   // private launchEvent: TLaunchEvent = 'click'
   public onClose?: () => void;
   private scrollHandler?: () => void;
@@ -42,6 +43,7 @@ export class CRReactiveTooltip {
     this.content = content;
     this.showOn = showOn
     this.hideOn = hideOn
+    log('this.hideOn', this.hideOn)
     this._anchor = anchor;
     this.timeout = timeout
     if (anchor instanceof HTMLElement) {
@@ -53,20 +55,56 @@ export class CRReactiveTooltip {
     }
 
     this.setAnchor()
-    this.setShowHide()
+    this.setShowHandler(this.showOn)
+    this.setHideHandler(this.hideOn)
     this.stick = stick as TStick;
     // console.log('stick', stick)
-    this.userStyles = userStyles as TUserStyles;
+    this.userStyles = { ...userStyles, boxSize: 'border-box' } as TUserStyles
     // this.onClose = onClose as TOnClose;
+    this.createElement()
   }
   isActive() {
     return this.tooltipEl !== undefined;
   }
-  private showx() {
-
+  // Type-safe Object.keys helper
+  private typedKeys<T extends object>(obj: T): (keyof T)[] {
+    return Object.keys(obj) as (keyof T)[];
   }
-  private hidex() {
 
+  public reshape(options: Partial<ITooltipOptions>) {
+    for (const key of this.typedKeys(options)) {
+      const val = options[key]; // Fully typed! 'key' is keyof ITooltipOptions
+      switch (key) {
+        case 'anchor':
+          this._anchor = val as THovered
+          this.anchorRect = (this._anchor as HTMLElement).getBoundingClientRect()
+          break
+        case 'content':
+          this.content = val as HTMLElement | string
+          break
+        case 'timeout':
+          this.timeout = val as number
+          break
+        case 'showOn':
+          this.setShowHandler(val as TShow)
+          break
+        case 'hideOn':
+          this.setHideHandler(val as TShow)
+          break
+        case 'stick':
+          this.stick = val as TStick
+          break
+        case 'userStyles':
+          this.userStyles = val as TUserStyles
+          break
+        case 'onClose':
+          this.onClose = val as TOnClose
+          break
+
+      }
+    }
+    log('returned from reshape')
+    return this as CRReactiveTooltip
   }
   private setAnchor() {
     if (!this._anchor) {
@@ -77,36 +115,51 @@ export class CRReactiveTooltip {
       this.anchorRect = (this._anchor as HTMLElement).getBoundingClientRect()
     }
   }
-  private setShowHide() {
+  private setShowHandler(str: string) {
     const showhandler = (e: MouseEvent) => {
       this.show()
     }
+    (this._anchor as HTMLElement).removeEventListener(this.showOn, showhandler);
+    tick().then(() => {
+      return new Promise((resolve) => setTimeout(resolve, 300))
+    });
+    this.showOn = str as TShow
     (this._anchor as HTMLElement).addEventListener(this.showOn, showhandler)
+  }
+
+  private setHideHandler(str: string | undefined) {
     const hidehandler = (e: MouseEvent) => {
       this.fadeOut()
     }
+    (this._anchor as HTMLElement).removeEventListener(this.showOn, hidehandler);
+    if (!str) {
+      return
+    }
+    tick().then(() => {
+      return new Promise((resolve) => setTimeout(resolve, 300))
+    });
+    this.hideOn = str as THide
     (this._anchor as HTMLElement).addEventListener(this.hideOn, hidehandler)
   }
-
   private async fadeOut() {
     if (!this.tooltipEl) return;
 
     this.tooltipEl.style.opacity = '0';
-    await new Promise((r) => setTimeout(r, 300));
-    this.tooltipEl.remove();
-    this.tooltipEl = undefined;
-    this.anchorRect = undefined;
+    // await new Promise((r) => setTimeout(r, 300));
+    // this.tooltipEl.remove();
+    // this.tooltipEl = undefined;
+    // this.anchorRect = undefined;
 
-    // cleanup listeners
-    if (this.scrollHandler) {
-      window.removeEventListener('scroll', this.scrollHandler);
-      window.removeEventListener('resize', this.scrollHandler);
-      this.scrollHandler = undefined;
-    }
-    if (this.autoCloseTimer) {
-      clearTimeout(this.autoCloseTimer);
-      this.autoCloseTimer = undefined;
-    }
+    // // cleanup listeners
+    // if (this.scrollHandler) {
+    //   window.removeEventListener('scroll', this.scrollHandler);
+    //   window.removeEventListener('resize', this.scrollHandler);
+    //   this.scrollHandler = undefined;
+    // }
+    // if (this.autoCloseTimer) {
+    //   clearTimeout(this.autoCloseTimer);
+    //   this.autoCloseTimer = undefined;
+    // }
   }
 
   private updatePosition() {
@@ -192,43 +245,12 @@ export class CRReactiveTooltip {
       fontSize: '14px',
       width: 'max-content',
       boxSizing: 'border-box',
-      padding: this.timeout === 0 ? '6px 22px 8px 6px' : '6px 6px 8px 6px',
+      padding: this.timeout === 0 ? '6px 20px 8px 6px' : '6px 0 8px 6px',
       transition: 'opacity 0.3s ease, left 0.2s cubic-bezier(0.25, 1, 0.5, 1), top 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
       ...this.userStyles
     });
   }
-
-  private setupTracking() {
-    this.scrollHandler = () => {
-      if (this.anchorRect && 'left' in this.anchorRect) {
-        // if it was an element, we would need a reference to re-getBoundingClientRect
-        // for simplicity we only track pure coordinates or initial rect
-      }
-      this.updatePosition();
-    };
-
-    window.addEventListener('scroll', this.scrollHandler, { passive: true });
-    window.addEventListener('resize', this.scrollHandler, { passive: true });
-  }
-
-  public async show(
-    // anchor: THovered,
-    // content: HTMLElement | string,
-    // timeout = 3000,
-    // stick: TStick = 'above',
-    // customStyles: Record<string, string> = {},
-    // onClose?: () => void
-  ) {
-    // If this instance is already showing something, close it first
-    if (this.tooltipEl) {
-      await this.hide();
-    }
-
-    // this.timeout = this.timeout;
-    // this.stick = this.stick;
-    // this.userStyles = customStyles;
-    // this.onClose = onClose;
-
+  private createElement() {
     // Create element
     if (typeof this.content === 'string') {
       this.tooltipEl = document.createElement('div');
@@ -273,7 +295,7 @@ export class CRReactiveTooltip {
         e.stopPropagation();
         this.hide();
       };
-      this.tooltipEl.style.paddingRight = '28px';
+      this.tooltipEl.style.paddingRight = '20px';
       this.tooltipEl.appendChild(btn);
     }
 
@@ -283,7 +305,40 @@ export class CRReactiveTooltip {
 
     // Fade in
     this.tooltipEl.offsetHeight;
-    this.tooltipEl.style.opacity = '1';
+  }
+  private setupTracking() {
+    this.scrollHandler = () => {
+      if (this.anchorRect && 'left' in this.anchorRect) {
+        // if it was an element, we would need a reference to re-getBoundingClientRect
+        // for simplicity we only track pure coordinates or initial rect
+      }
+      this.updatePosition();
+    };
+
+    window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    window.addEventListener('resize', this.scrollHandler, { passive: true });
+  }
+
+  public async show(
+    // anchor: THovered,
+    // content: HTMLElement | string,
+    // timeout = 3000,
+    // stick: TStick = 'above',
+    // customStyles: Record<string, string> = {},
+    // onClose?: () => void
+  ) {
+    // If this instance is already showing something, close it first
+    if (this.tooltipEl) {
+      await this.hide();
+    }
+
+    // this.timeout = this.timeout;
+    // this.stick = this.stick;
+    // this.userStyles = customStyles;
+    // this.onClose = onClose;
+
+    // constructor must get anchor as HTMLElement or string to build this._anchor
+    this.tooltipEl!.style.opacity = '1';
 
     if (this.timeout > 0) {
       this.autoCloseTimer = setTimeout(() => this.hide(), this.timeout);
