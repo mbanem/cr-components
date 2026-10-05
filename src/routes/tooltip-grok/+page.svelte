@@ -22,7 +22,7 @@
 	const ttOptions = {
 		stick: 'left',
 		content: 'First tooltip,can stay open',
-		timeout: 0,
+		timeout: 3000,
 		showOn: 'mouseenter' as TShow,
 		userStyles: { color: 'red', backgroundColor: 'cornsilk' }
 	} satisfies Partial<ITooltipOptions>;
@@ -54,19 +54,25 @@
 	});
 
 	function showBoth() {
-		// adjust
-		// ((tip1.timeout = 0),
-		// (tip1.content = 'First tooltip,can stay open'),
-		// (tip1.userStyles = { color: 'red', backgroundColor: 'cornsilk' }),
-		// (tip1.stick = 'above'),
-		// tip1).show();
+		((tip1.timeout = 6000),
+		(tip1.content = 'First tooltip will change\nposition in 4 sec'),
+		(tip1.userStyles = { color: 'red', backgroundColor: 'cornsilk' }),
+		(tip1.stick = 'above'),
+		tip1).show();
+
 		const opt = {
-			timeout: 0,
-			content: 'First tooltip,can stay open',
-			userStyles: { color: 'red', backgroundColor: 'cornsilk', stick: 'above' }
+			timeout: 6000,
+			content: 'Second position\nmoved from above',
+			userStyles: { color: 'blue', backgroundColor: 'lightgreen', stick: 'above' }
 		} as Partial<ITooltipOptions>;
-		tip1.reshape(opt).show();
-		((tip2.timeout = 0), (tip1.content = 'chenges position\nafter 4 seconds'), tip2).show(); // both will be visible at the same time
+		setTimeout(() => {
+			tip1.reshape(opt).show();
+		}, 4000);
+		// ((tip1.timeout = 4000),
+		// (tip1.content = 'Second position\nmved from above'),
+		// (tip1.userStyles = { color: 'blue', backgroundColor: 'lightgreen', stick: 'above' }),
+		// tip1).show();
+		((tip2.timeout = 6000), (tip2.content = 'will hide in 6 seconds'), tip2).show(); // both will be visible at the same time
 		// reveert tooltip to the starting state as hid will not clear tooltip
 
 		// change some options on tip1 when 4 sec elapse
@@ -75,6 +81,9 @@
 			(tip1.hideOn = undefined),
 			tip1).show();
 		}, 4000);
+		setTimeout(() => {
+			tip1.reverse();
+		}, 7000);
 	}
 </script>
 

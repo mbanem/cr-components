@@ -1,5 +1,6 @@
-import type { TStick, TUserStyles, TShow, THide, TOnClose, THovered } from '$lib/types/tooltip-args'
+import type { THovered, TContent, TStick, TUserStyles, TShow, THide, TOnClose, } from '$lib/types/tooltip-args'
 import { setupEventHandlers } from '$lib/utils/setupEventHandlers';
+import { throws } from 'assert';
 import { tick } from 'svelte';
 
 export interface ITooltipOptions {
@@ -14,16 +15,17 @@ export interface ITooltipOptions {
 }
 
 export class CRReactiveTooltip {
+  // constructor based args begin
   private _anchor: THovered
-  public content: HTMLElement | string
+  private _content: HTMLElement | string
   private tooltipEl: HTMLElement | undefined;
-  private anchorRect: DOMRect | undefined;
   public stick: TStick = 'above';
   public showOn: TShow = 'click';
   public hideOn?: THide = 'mouseleave';
   public timeout = 3000;
   public userStyles: TUserStyles = {};
-  // private launchEvent: TLaunchEvent = 'click'
+  // constructor based args end
+  private anchorRect: DOMRect | undefined;
   public onClose?: () => void;
   private scrollHandler?: () => void;
   private autoCloseTimer?: ReturnType<typeof setTimeout>;
@@ -40,7 +42,7 @@ export class CRReactiveTooltip {
       userStyles
     } = options;
 
-    this.content = content;
+    this._content = content;
     this.showOn = showOn
     this.hideOn = hideOn
     log('this.hideOn', this.hideOn)
@@ -70,8 +72,23 @@ export class CRReactiveTooltip {
   private typedKeys<T extends object>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
   }
-
+  public set content(cnt: TContent) {
+    if (cnt instanceof HTMLElement) {
+      this._content = cnt as TContent
+    } else if (typeof cnt === 'string') {
+      this._content = cnt
+      this.createElement()
+    }
+  }
+  private shapes: Partial<ITooltipOptions>[] = []
+  public reverse() {
+    const opt = this.shapes.pop()
+    if (opt) {
+      this.reshape(opt)
+    }
+  }
   public reshape(options: Partial<ITooltipOptions>) {
+    this.shapes.push(options)
     for (const key of this.typedKeys(options)) {
       const val = options[key]; // Fully typed! 'key' is keyof ITooltipOptions
       switch (key) {
@@ -80,7 +97,10 @@ export class CRReactiveTooltip {
           this.anchorRect = (this._anchor as HTMLElement).getBoundingClientRect()
           break
         case 'content':
-          this.content = val as HTMLElement | string
+          this._content = val as HTMLElement | string
+          if (typeof this._content === 'string') {
+            this.createElement()
+          }
           break
         case 'timeout':
           this.timeout = val as number
@@ -103,6 +123,7 @@ export class CRReactiveTooltip {
 
       }
     }
+    this.createElement()
     log('returned from reshape')
     return this as CRReactiveTooltip
   }
@@ -145,10 +166,12 @@ export class CRReactiveTooltip {
     if (!this.tooltipEl) return;
 
     this.tooltipEl.style.opacity = '0';
-    // await new Promise((r) => setTimeout(r, 300));
-    // this.tooltipEl.remove();
-    // this.tooltipEl = undefined;
-    // this.anchorRect = undefined;
+    await new Promise((r) => setTimeout(r, 300));
+    try {
+      this.tooltipEl.remove();
+    } catch { }
+    this.tooltipEl = undefined;
+    this.anchorRect = undefined;
 
     // // cleanup listeners
     // if (this.scrollHandler) {
@@ -251,17 +274,21 @@ export class CRReactiveTooltip {
     });
   }
   private createElement() {
+    if (this.tooltipEl) {
+      this.fadeOut()
+      tick().then(() => { return new Promise((resolve) => setTimeout(resolve, 300)) })
+    }
     // Create element
-    if (typeof this.content === 'string') {
+    if (typeof this._content === 'string') {
       this.tooltipEl = document.createElement('div');
-      this.tooltipEl.innerHTML = this.content
+      this.tooltipEl.innerHTML = this._content
         .split(/,|\n/)
         .map((p) => p.trim())
         .filter(Boolean)
         .map((p) => `<p style="margin:0;padding:0;line-height:1.4">${p}</p>`)
         .join('');
     } else {
-      this.tooltipEl = this.content;
+      this.tooltipEl = this._content;
     }
 
     this.tooltipEl.classList.add('dynamic-tooltip');
@@ -331,7 +358,7 @@ export class CRReactiveTooltip {
     if (this.tooltipEl) {
       await this.hide();
     }
-
+    this.createElement()
     // this.timeout = this.timeout;
     // this.stick = this.stick;
     // this.userStyles = customStyles;
