@@ -268,7 +268,7 @@ export class CRReactiveTooltip {
       fontSize: '14px',
       width: 'max-content',
       boxSizing: 'border-box',
-      padding: this.timeout === 0 ? '6px 20px 8px 6px' : '6px 0 8px 6px',
+      padding: this.timeout === 0 ? '6px 20px 8px 6px' : '6px 6px 8px 6px',
       transition: 'opacity 0.3s ease, left 0.2s cubic-bezier(0.25, 1, 0.5, 1), top 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
       ...this.userStyles
     });

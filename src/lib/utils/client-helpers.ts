@@ -1,3 +1,4 @@
+import { type TPosition } from '$lib/types/tooltip-args'
 export function capitalize(str: string): string {
   return (
     str
@@ -35,4 +36,43 @@ export function isValidListFormat(input: string): boolean {
   const pattern = /["'](.+)['"]\s*["'](.+)['"]\s*,?\s*(\w+)\]?/
   // /^(?:'([^'\\]|\\.)*'|"([^"\\]|\\.)*")\s*:\s*(?:(?:'([^'\\]|\\.)*'|"([^"\\]|\\.)*")|\[\s*(?:'([^'\\]|\\.)*'|"([^"\\]|\\.)*")\s*,\s*(?:true|false)\s*\])$/;
   return pattern.test(input.trim().replace(/[\[\]:]/g, ''));
+}
+export function isTPosition(anchor: any): anchor is TPosition {
+  if (typeof anchor !== 'object' || anchor === null) return false;
+  if (typeof anchor.x !== 'number' || Number.isNaN(anchor.x)) return false
+  if (typeof anchor.y !== 'number' || Number.isNaN(anchor.y)) return false
+  return Object.keys(anchor).length === 2;
+}
+export function isTStick(stick: any) {
+  if (stick === undefined) {
+    return false
+  }
+  return /(left|rightabove|below)/.test(stick)
+}
+
+export function isTOnCloseThrowable(onclose: any) {
+  if (typeof onclose !== 'function' || onclose.length > 0) {
+    throwErr('OnClose should be of type () => void')
+  }
+}
+export function isTShowOnThrowable(showon: any) {
+  if (showon === undefined) {
+    return 'click'
+  }
+  if (!/(mouseenter|mouseleave|click)/.test(showon)) {
+    throwErr('ShowOn should be mouseenter, mouseleave or click')
+  }
+}
+export function isTHideOnThrowable(hideon: any) {
+  if (hideon === undefined) {
+    return 'mouseleave'
+  }
+  if (hideon !== 'mouseleave') {
+    throwErr('HideOn should be mouseleave or undefined')
+  }
+  return hideon // as only mouseout is involved 
+}
+
+export function throwErr(msg: string) {
+  throw new Error(msg)
 }

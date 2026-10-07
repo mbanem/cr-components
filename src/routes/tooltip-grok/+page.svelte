@@ -21,7 +21,7 @@
 	// some (Partial)of tooltip-args used in this page
 	const ttOptions = {
 		stick: 'left',
-		content: 'First tooltip,can stay open',
+		content: 'First tooltip\nhides after 3sec',
 		timeout: 3000,
 		showOn: 'mouseenter' as TShow,
 		userStyles: { color: 'red', backgroundColor: 'cornsilk' }
@@ -54,41 +54,62 @@
 	});
 
 	function showBoth() {
-		((tip1.timeout = 6000),
-		(tip1.content = 'First tooltip will change\nposition in 4 sec'),
-		(tip1.userStyles = { color: 'red', backgroundColor: 'cornsilk' }),
-		(tip1.stick = 'above'),
-		tip1).show();
+		tip1
+			.reshape({
+				timeout: 8000,
+				content: 'First tooltip will change\nposition in 4 sec',
+				userStyles: { color: 'red', backgroundColor: 'cornsilk' },
+				stick: 'above'
+			})
+			.show();
 
 		const opt = {
-			timeout: 6000,
+			timeout: 4000,
 			content: 'Second position\nmoved from above',
-			userStyles: { color: 'blue', backgroundColor: 'lightgreen', stick: 'above' }
+			userStyles: { color: 'green', border: '3px solid green' },
+			stick: 'below',
+			hideOn: undefined
 		} as Partial<ITooltipOptions>;
-		setTimeout(() => {
-			tip1.reshape(opt).show();
-		}, 4000);
+
+		// setTimeout(() => {
+		// 	tip1.reshape(opt).show();
+		// }, 4000);
 		// ((tip1.timeout = 4000),
 		// (tip1.content = 'Second position\nmved from above'),
 		// (tip1.userStyles = { color: 'blue', backgroundColor: 'lightgreen', stick: 'above' }),
 		// tip1).show();
-		((tip2.timeout = 6000), (tip2.content = 'will hide in 6 seconds'), tip2).show(); // both will be visible at the same time
+		((tip2.timeout = 8000), (tip2.content = 'will hide in 8 seconds'), tip2).show(); // both will be visible at the same time
 		// reveert tooltip to the starting state as hid will not clear tooltip
 
 		// change some options on tip1 when 4 sec elapse
 		setTimeout(() => {
-			(((tip1.userStyles = { color: 'green', border: '3px solid green' }), (tip1.stick = 'below')),
-			(tip1.hideOn = undefined),
-			tip1).show();
+			tip1.reshape(opt).show();
 		}, 4000);
 		setTimeout(() => {
 			tip1.reverse();
-		}, 7000);
+			tip1.reverse();
+		}, 8000);
 	}
 </script>
 
 <div class="wrapper">
-	<button bind:this={btn1} onclick={() => tip1.show()}>on mouseenter & close me</button>
+	<button
+		bind:this={btn1}
+		onmouseenter={() =>
+			tip1
+				.reshape({
+					...ttOptions,
+					anchor: btn1
+				})
+				.show()}
+		onclick={() =>
+			tip1
+				.reshape({
+					...ttOptions,
+					anchor: btn1
+				})
+				.show()}>on mouseenter & close me</button
+	>
 	<button bind:this={btn2}>on mouseenter & mouseleave</button>
 	<button onmouseenter={showBoth}>Show both</button>
 </div>
