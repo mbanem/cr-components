@@ -16,7 +16,7 @@ export interface ITooltipOptions {
 
 export class CRReactiveTooltip {
   // constructor based args begin
-  private _anchor: THovered
+  private _anchor: THovered | undefined = undefined
   private _content: HTMLElement | string
   private tooltipEl: HTMLElement | undefined;
   public stick: TStick = 'above';

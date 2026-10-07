@@ -19,16 +19,14 @@ $cr-font-family: system-ui,
   --cr-input-error-color: #dc143c;
   --cr-radio-group-width: 19rem;
   --cr-disabled-color: #808080;
-
-  body {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    position: relative;
-  }
-
 }
 
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+}
 
 // 2. SCSS Variable Abstractions (Convenient shortcuts for development)
 // $cr-placeholder: #{var(--cr-color-placeholder, #9ca3af)};
