@@ -19,7 +19,16 @@ $cr-font-family: system-ui,
   --cr-input-error-color: #dc143c;
   --cr-radio-group-width: 19rem;
   --cr-disabled-color: #808080;
+
+  body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    position: relative;
+  }
+
 }
+
 
 // 2. SCSS Variable Abstractions (Convenient shortcuts for development)
 // $cr-placeholder: #{var(--cr-color-placeholder, #9ca3af)};
@@ -48,16 +57,15 @@ $cr-input-error-color: #{var(--cr-input-error-color),#dc143c};
 $cr-input-disabled-opacity: 0.5;
 
 
-/* ---------------------------------------------------------
- Floating label
- ---------------------------------------------------------*/
+/* ---------------------------------------------------------Floating label
+---------------------------------------------------------*/
 
 $cr-label-color: #777;
 $cr-label-focus-color: #0066cc;
 
 $cr-label-background: white;
 
-:global(:root) {
+:root {
   --disabled-color: gray;
   --attr-id: #008000;
   --badge-color: #000080;

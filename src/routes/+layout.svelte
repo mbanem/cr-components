@@ -27,7 +27,7 @@
 	a {
 		display: inline-block;
 		padding: 0 1px;
-		text-decoration: nobe;
+		text-decoration: none;
 		color: navy;
 		&:hover {
 			color: gray;

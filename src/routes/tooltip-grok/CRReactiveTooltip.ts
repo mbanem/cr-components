@@ -1,13 +1,13 @@
-import type { THovered, TContent, TStick, TUserStyles, TShow, THide, TOnClose, } from '$lib/types/tooltip-args'
-import { setupEventHandlers } from '$lib/utils/setupEventHandlers';
-import { throws } from 'assert';
+import type { THovered, TContent, TStick, TUserStyles, TShow, THide, TOnClose, TPosition } from '$lib/types/tooltip-args'
+import { isTPosition } from '$lib/utils/client-helpers';
+// import { throws } from 'assert';
 import { tick } from 'svelte';
 
 export interface ITooltipOptions {
   anchor: THovered;
   content: HTMLElement | string;
   timeout: number
-  showOn: TShow;
+  showOn?: TShow;
   hideOn?: THide
   stick?: TStick;
   userStyles?: TUserStyles;
@@ -41,29 +41,25 @@ export class CRReactiveTooltip {
       timeout,
       userStyles
     } = options;
-
     this._content = content;
     this.showOn = showOn
     this.hideOn = hideOn
-    log('this.hideOn', this.hideOn)
-    this._anchor = anchor;
+    this.anchor = anchor;
     this.timeout = timeout
-    if (anchor instanceof HTMLElement) {
-      // 1. It is a DOM element
-    } else if (anchor instanceof MouseEvent) {
-      // 2. It is a MouseEvent
-      // console.log('document when mouseEvent')
-      this._anchor = document.elementFromPoint(anchor.clientX, anchor.clientY) as HTMLElement;
-    }
 
-    this.setAnchor()
-    this.setShowHandler(this.showOn)
-    this.setHideHandler(this.hideOn)
     this.stick = stick as TStick;
     // console.log('stick', stick)
     this.userStyles = { ...userStyles, boxSize: 'border-box' } as TUserStyles
+
+    if (isTPosition(anchor)) {
+      this.createElement(anchor);
+      (this.tooltipEl as HTMLElement).style.opacity = '1'
+    } else {
+      this.createElement()
+      this.setShowHandler(this.showOn)
+      this.setHideHandler(this.hideOn)
+    }
     // this.onClose = onClose as TOnClose;
-    this.createElement()
   }
   isActive() {
     return this.tooltipEl !== undefined;
@@ -81,6 +77,24 @@ export class CRReactiveTooltip {
     }
   }
   private shapes: Partial<ITooltipOptions>[] = []
+  private set anchor(anchor: any) {
+    if (anchor instanceof HTMLElement) {
+      this._anchor = anchor
+    } else if (anchor instanceof MouseEvent) {
+      this._anchor = document.elementFromPoint(anchor.clientX, anchor.clientY) as HTMLElement;
+    } else if (isTPosition(anchor)) {
+      this._anchor = new DOMRect(anchor.x, anchor.y) as THovered
+    } else {
+      throw new Error('anchor is not THovered -- HTMLElement, string or {x:number, y:number}')
+    }
+  }
+  private set anchorrect(anchor: any) {
+    if (anchor instanceof HTMLElement || anchor instanceof MouseEvent) {
+      this.anchorRect = (this._anchor as HTMLElement).getBoundingClientRect()
+    } else if (isTPosition(anchor)) {
+      this.anchorRect = new DOMRect(anchor.x, anchor.y) as DOMRect
+    }
+  }
   public reverse() {
     const opt = this.shapes.pop()
     if (opt) {
@@ -273,7 +287,7 @@ export class CRReactiveTooltip {
       ...this.userStyles
     });
   }
-  private createElement() {
+  private createElement(pos?: TPosition) {
     if (this.tooltipEl) {
       this.fadeOut()
       tick().then(() => { return new Promise((resolve) => setTimeout(resolve, 300)) })
@@ -291,8 +305,8 @@ export class CRReactiveTooltip {
       this.tooltipEl = this._content;
     }
 
-    this.tooltipEl.classList.add('dynamic-tooltip');
-    Object.assign(this.tooltipEl.style, { position: 'fixed', opacity: '0', boxSizing: 'border-box' });
+    // this.tooltipEl.classList.add('dynamic-tooltip');
+    Object.assign(this.tooltipEl.style, { position: 'fixed', opacity: '0', boxSizing: 'border-box', });
 
     // Resolve anchor
     if (this._anchor instanceof HTMLElement) {
@@ -300,7 +314,19 @@ export class CRReactiveTooltip {
     } else if (this._anchor && 'clientX' in this._anchor) {
       const el = document.elementFromPoint(this._anchor.clientX, this._anchor.clientY);
       this.anchorRect = el?.getBoundingClientRect();
+    } else if (pos) {
+      const x = `${pos.x}px`
+      const y = `${pos.y}px`
+      Object.assign(this.tooltipEl.style, {
+        position: 'absolute',
+        top: y,
+        left: x,
+        opacity: '1',
+
+        ...this.userStyles
+      })
     }
+
 
     // Close button
     if (this.timeout === 0 && !this.hideOn) {
@@ -324,6 +350,10 @@ export class CRReactiveTooltip {
       };
       this.tooltipEl.style.paddingRight = '20px';
       this.tooltipEl.appendChild(btn);
+    } else if (pos) {
+      if (this.timeout > 0) {
+        this.autoCloseTimer = setTimeout(() => this.hide(), this.timeout);
+      }
     }
 
     document.body.appendChild(this.tooltipEl);
