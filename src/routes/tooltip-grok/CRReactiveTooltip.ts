@@ -39,6 +39,7 @@ export class CRReactiveTooltip {
       showOn,
       hideOn,
       timeout,
+      onClose,
       userStyles
     } = options;
     this._content = content;
@@ -59,7 +60,7 @@ export class CRReactiveTooltip {
       this.setShowHandler(this.showOn)
       this.setHideHandler(this.hideOn)
     }
-    // this.onClose = onClose as TOnClose;
+    this.onClose = onClose as TOnClose;
   }
   isActive() {
     return this.tooltipEl !== undefined;
@@ -180,23 +181,6 @@ export class CRReactiveTooltip {
     if (!this.tooltipEl) return;
 
     this.tooltipEl.style.opacity = '0';
-    await new Promise((r) => setTimeout(r, 300));
-    try {
-      this.tooltipEl.remove();
-    } catch { }
-    this.tooltipEl = undefined;
-    this.anchorRect = undefined;
-
-    // // cleanup listeners
-    // if (this.scrollHandler) {
-    //   window.removeEventListener('scroll', this.scrollHandler);
-    //   window.removeEventListener('resize', this.scrollHandler);
-    //   this.scrollHandler = undefined;
-    // }
-    // if (this.autoCloseTimer) {
-    //   clearTimeout(this.autoCloseTimer);
-    //   this.autoCloseTimer = undefined;
-    // }
   }
 
   private updatePosition() {
@@ -376,6 +360,33 @@ export class CRReactiveTooltip {
     window.addEventListener('resize', this.scrollHandler, { passive: true });
   }
 
+  public wakeUp() {
+    if (this.tooltipEl) {
+      this.tooltipEl.style.opacity = '1';
+      if (this.timeout > 0) {
+        this.autoCloseTimer = setTimeout(() => this.hide(), this.timeout);
+      }
+    }
+  }
+  public destroy() {
+    this.hide()
+    try {
+      this.tooltipEl?.remove();
+    } catch { }
+    this.tooltipEl = undefined;
+    this.anchorRect = undefined;
+
+    // cleanup listeners
+    if (this.scrollHandler) {
+      window.removeEventListener('scroll', this.scrollHandler);
+      window.removeEventListener('resize', this.scrollHandler);
+      this.scrollHandler = undefined;
+    }
+    if (this.autoCloseTimer) {
+      clearTimeout(this.autoCloseTimer);
+      this.autoCloseTimer = undefined;
+    }
+  }
   public async show(
     // anchor: THovered,
     // content: HTMLElement | string,
@@ -405,7 +416,7 @@ export class CRReactiveTooltip {
   }
 
   async hide() {
-    this.onClose?.();
     await this.fadeOut();
+    this.onClose?.();
   }
 }

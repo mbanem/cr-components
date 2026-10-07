@@ -17,7 +17,8 @@
 	let tip1: CRReactiveTooltip;
 	let tip2: CRReactiveTooltip;
 	let tip3: CRReactiveTooltip;
-	let pos: CRReactiveTooltip;
+	let pos1: CRReactiveTooltip;
+	let pos2: CRReactiveTooltip;
 
 	// some (Partial)of tooltip-args used in this page
 	const ttOptions = {
@@ -28,7 +29,7 @@
 		userStyles: { color: 'red', backgroundColor: 'cornsilk' }
 	} satisfies Partial<ITooltipOptions>;
 
-	const posOptions = {
+	const posOptions1 = {
 		stick: 'left',
 		content: 'Set to x: 50 y: 200\nhide after 3sec',
 		timeout: 3000,
@@ -43,16 +44,26 @@
 			borderRadius: '4px'
 		}
 	} satisfies Partial<ITooltipOptions>;
+	const posOptions2 = {
+		stick: 'left',
+		anchor: { x: 250, y: 200 },
+		timeout: 0,
+		content: 'Set to x: 250 y: 200\nhide on manual click',
+		onClose: wakeUp,
+		userStyles: {
+			color: 'navy',
+			backgroundColor: 'aliceblue',
+			width: 'max-content',
+			textWrap: 'nowrap',
+			padding: '4px 6px',
+			border: '1px solid lightgray',
+			borderRadius: '4px'
+		}
+	} satisfies Partial<ITooltipOptions>;
+
 	// $effect will take care of bnt1,btn2,btn3 to be ready
 	$effect(() => {
-		// shown immediatelly no showOn  as no way for that
-		let pos1 = new CRReactiveTooltip(posOptions);
-		let pos2 = new CRReactiveTooltip({
-			...posOptions,
-			anchor: { x: 250, y: 200 },
-			timeout: 0,
-			content: 'Set to x: 250 y: 200\nhide on manual click'
-		});
+		// shown immediatelly no showOn  as no way for tha
 
 		tip1 = new CRReactiveTooltip({
 			...ttOptions,
@@ -113,6 +124,29 @@
 			tip1.reverse();
 		}, 8000);
 	}
+	let f = true;
+	let optButton: HTMLButtonElement | undefined = undefined;
+	function wakeUp() {
+		log('wakeUp called');
+		if (optButton) {
+			optButton.innerText = 'wake up tooltip';
+			Object.assign(optButton.style, { color: 'white', backgroundColor: 'navy' });
+		} else {
+			log('no optButton');
+		}
+	}
+
+	function showOpt(e: MouseEvent) {
+		if (f) {
+			pos1 = new CRReactiveTooltip(posOptions1);
+			pos2 = new CRReactiveTooltip(posOptions2);
+			optButton = e.target as HTMLButtonElement;
+			f = false;
+		} else {
+			pos1.wakeUp();
+			pos2.wakeUp();
+		}
+	}
 </script>
 
 <div class="wrapper">
@@ -141,6 +175,13 @@
 	<button bind:this={btn3}>on click & close me</button>
 </div>
 <pre class="tooltip-types">
+	<button onclick={showOpt} class="show-opt">show options</button> <button
+		onclick={() => {
+			pos1.destroy();
+			pos2.destroy();
+		}}
+		class="destroy">destroy tooltup</button
+	>
 	Those two CRReactiveTooltips are positoned via coordinates x,y
 	and are not connected to anyof HTML elements like buttons and
 	are displayed at the instantiating of CRReactiveTooltip class.
@@ -162,5 +203,21 @@
 	}
 	.tooltip-types {
 		margin: -6rem 0 0 2rem;
+	}
+	.show-opt,
+	.destroy {
+		color: navy;
+		background-color: skyblue;
+		border: 1px solid gray;
+		border-radius: 6px;
+		outline: none;
+		width: 10rem;
+		text-align: center;
+		padding: 4px 1rem;
+		cursor: pointer;
+	}
+	.destroy {
+		color: cornsilk;
+		background-color: tomato;
 	}
 </style>
