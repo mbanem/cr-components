@@ -4,6 +4,7 @@
 		'in format xxx-xxx-xxxx, ext. xx\nwith text-overflow: ellipsis;\nfor demonstration purposes';
 	export const REFORMAT = 'DONE? Hit Enter to reformat';
 	export const REQUIRED = 'Entry is required';
+	export const WRONGDROPMSG = 'dropped data invalid';
 	export const isGreen = new RegExp(/(press comma|DONE\?)/);
 	export const MAXLENGTHMSG = 'maximum length reached';
 	export const MAXLENGTH = 24;
@@ -101,6 +102,7 @@
 		reformat: ''
 	});
 	let maxLengthMsg = $state(MAXLENGTHMSG);
+	let wrongDropMsg = $state('');
 	const log = console.log;
 	let imgPath = '/phone-number-setup.png';
 	let timer: ReturnType<typeof setTimeout>;
@@ -133,7 +135,7 @@
 		return /^(\d{3})-\d{3}-\d{4}$|^\d{3}-\d{3}-\d{4}, ext\. \d{1,5}$/.test(value);
 	}
 	function clearMaxLengthMsg() {
-		maxLengthMsg = '';
+		maxLengthMsg = wrongDropMsg = '';
 	}
 	let errorMessage = $derived.by(() => {
 		if (!s.isDirty && !s.isFocused) return ''; // inital page state
@@ -147,13 +149,13 @@
 			// 			log('errorMessage REFORMAT');
 			return REFORMAT;
 		}
-		if (value.length === MAXLENGTH && maxLengthMsg) {
+		if ((value.length === MAXLENGTH && maxLengthMsg) || wrongDropMsg) {
 			// log('trying maxlength');
 			setTimeout(() => {
 				clearMaxLengthMsg();
 			}, 2000);
 
-			return maxLengthMsg;
+			return wrongDropMsg ?? maxLengthMsg;
 		}
 		return s.reformat ? s.reformat : isErroneous ? isErroneous(value) : '';
 	}) as string;
@@ -183,16 +185,28 @@
 		}
 	}
 
-	function handlePaste(e: ClipboardEvent) {
+	function handleDragover(e: DragEvent) {
 		e.preventDefault();
-
+	}
+	function handleDrop(e: DragEvent) {
+		inputEl?.focus();
+		log('handleDrop entry');
 		// 1. Get plain text from clipboard
-		const pastedText = e.clipboardData?.getData('text') || '';
-		s.isDirty = true;
-		// log('pastedText', pastedText);
+		const droppedText = e.dataTransfer?.getData('text') || '';
+		// log('droppedText', droppedText);
 		// 2. Extract digits only
-		const digits = pastedText.replace(/\D/g, '');
-		if (!digits) return;
+		const digits = droppedText.replace(/\D/g, '');
+		log('digits?', digits, !digits);
+		if (!digits) {
+			e.preventDefault();
+			log('no digits preventDefault');
+			setCssVarColor('--cr-input-placeholder-color', 'crimson');
+			s.placeholder = REQUIRED;
+			wrongDropMsg = WRONGDROPMSG;
+			return;
+		}
+
+		s.isDirty = true;
 
 		const mainDigits = digits.slice(0, 10);
 		const extDigits = digits.slice(10, 15);
@@ -206,7 +220,7 @@
 		}
 
 		// 4. Attach extension if more than 10 digits were pasted or if 'ext' was in the text
-		const hasExtKeyword = /ext|x|,/i.test(pastedText);
+		const hasExtKeyword = /ext|x|,/i.test(droppedText);
 		if (extDigits.length > 0 || (mainDigits.length === 10 && hasExtKeyword)) {
 			formatted += `, ext. ${extDigits}`;
 		}
@@ -224,7 +238,8 @@
 		}
 	}
 	function handleInput(e: Event | KeyboardEvent) {
-		// log('handleInput entry', value);
+		log(e.type, inputEl?.value, value);
+		log('handleInput entry', value);
 		// if (isInTheMiddle) return;
 		// if (s.reformat) {
 		// 	// log('handleInput reformat');
@@ -483,7 +498,12 @@
 					checkCaretPosition();
 					handleKeyup(e);
 				}}
-				onpaste={handlePaste}
+				ondragover={handleDragover}
+				ondrop={async (e) => {
+					inputEl?.focus();
+					await tick();
+					handleDrop(e);
+				}}
 				onblur={handleBlur}
 				onfocus={(e) => {
 					checkCaretPosition();
