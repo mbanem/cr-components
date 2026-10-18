@@ -232,7 +232,11 @@ Package Manager e.g. pnpm.
 {/snippet}
 
 {#if isAboutActive}
-	<div class="page-info" style="position:absolute;top:1.5rem;left:0;z-index:200;">
+	<div
+		class="page-info"
+		data-caption="What Does This Page Do?"
+		style="position:absolute;top:1.5rem;left:0;z-index:200;"
+	>
 		{@render pagePurpose()}
 	</div>
 {/if}

@@ -89,7 +89,7 @@
 	<p>to see if that can be done and if not</p>
 	<p>modify some Params and repeat</p>
 </div>
-<!-- <CRReactiveTooltip bind:this={tt} onClose={tooltipOnClose}/> -->
+<!-- <ReactiveTooltip bind:this={tt} onClose={tooltipOnClose}/> -->
 {#snippet pagePurpose()}
 	<pre>
     

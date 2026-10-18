@@ -1,22 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { CRReactiveTooltip } from './CRReactiveTooltip';
-	import type { ITooltipOptions } from './CRReactiveTooltip';
-	import type {
-		TShowHide,
-		THovered,
-		TStick,
-		TLaunchEvent,
-		TOnClose,
-	} from './CRReactiveTooltip';
+	import { ReactiveTooltip } from './ReactiveTooltip';
+	import type { ITooltipOptions } from './ReactiveTooltip';
+	import type { TShowHide, THovered, TStick, TLaunchEvent, TOnClose } from './ReactiveTooltip';
 
 	// ---------- CRREactiveTooltip.ts ------------------
-	let tip1: CRReactiveTooltip | undefined = undefined;
-	let tip2: CRReactiveTooltip | undefined = undefined;
-	let tip3: CRReactiveTooltip | undefined = undefined;
-	let tipT1: CRReactiveTooltip | undefined = undefined;
-	let tipT2: CRReactiveTooltip | undefined = undefined;
-	let tippos: CRReactiveTooltip | undefined = undefined;
+	let tip1: ReactiveTooltip | undefined = undefined;
+	let tip2: ReactiveTooltip | undefined = undefined;
+	let tip3: ReactiveTooltip | undefined = undefined;
+	let tipT1: ReactiveTooltip | undefined = undefined;
+	let tipT2: ReactiveTooltip | undefined = undefined;
+	let tippos: ReactiveTooltip | undefined = undefined;
 
 	// Create as many independent tooltips as you want
 	let btn1: HTMLButtonElement;
@@ -42,14 +36,14 @@
 			userStyles: { backgroundColor: '#fff0f0', color: 'crimson', border: '1px solid crimson' }
 		} satisfies ITooltipOptions;
 
-		tip1 = new CRReactiveTooltip(tooltipOptions);
-		tip2 = new CRReactiveTooltip({ ...tooltipOptions, stick: 'below', anchor: btn2 });
+		tip1 = new ReactiveTooltip(tooltipOptions);
+		tip2 = new ReactiveTooltip({ ...tooltipOptions, stick: 'below', anchor: btn2 });
 
-		tip3 = new CRReactiveTooltip({ ...ttOptions, anchor: { x: 100, y: 50 } });
+		tip3 = new ReactiveTooltip({ ...ttOptions, anchor: { x: 100, y: 50 } });
 
-		tipT1 = new CRReactiveTooltip(ttOptions);
-		tipT2 = new CRReactiveTooltip({ ...ttOptions, anchor: btnt2 });
-		tippos = new CRReactiveTooltip({ ...tooltipOptions, anchor: { x: 200, y: 200 } });
+		tipT1 = new ReactiveTooltip(ttOptions);
+		tipT2 = new ReactiveTooltip({ ...ttOptions, anchor: btnt2 });
+		tippos = new ReactiveTooltip({ ...tooltipOptions, anchor: { x: 200, y: 200 } });
 	});
 	function show1() {
 		tip1?.show();
@@ -86,7 +80,7 @@
 	}
 </script>
 
-<!-- CRReactiveTooltip.ts start -->
+<!-- ReactiveTooltip.ts start -->
 <div class="main">
 	<div class="buttons-wrapper">
 		<button bind:this={btn1} onclick={show1}>click to show tooltip</button>
@@ -102,7 +96,7 @@
 	</div>
 </div>
 
-<!-- CRReactiveTooltip.ts end -->
+<!-- ReactiveTooltip.ts end -->
 
 <style lang="scss">
 	.main {

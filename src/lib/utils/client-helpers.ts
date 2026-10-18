@@ -1,4 +1,26 @@
 import { type TPosition } from '$lib/types/tooltip-args'
+
+export function formatPhoneNumber(rawValue: string): string {
+  const digits = rawValue.replace(/\D/g, '');
+  const mainDigits = digits.slice(0, 10);
+  const extDigits = digits.slice(10, 15);
+
+  let formatted = mainDigits;
+
+  // Progressive formatting: append dash as soon as 3 or 6 digits are reached
+  if (mainDigits.length >= 6) {
+    formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3, 6)}-${mainDigits.slice(6)}`;
+  } else if (mainDigits.length >= 3) {
+    formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3)}`;
+  }
+
+  // Handle extension triggering
+  if (rawValue.includes(',') || extDigits.length > 0) {
+    formatted += `, ext. ${extDigits}`;
+  }
+
+  return formatted;
+}
 export function capitalize(str: string): string {
   return (
     str
@@ -37,17 +59,26 @@ export function isValidListFormat(input: string): boolean {
   // /^(?:'([^'\\]|\\.)*'|"([^"\\]|\\.)*")\s*:\s*(?:(?:'([^'\\]|\\.)*'|"([^"\\]|\\.)*")|\[\s*(?:'([^'\\]|\\.)*'|"([^"\\]|\\.)*")\s*,\s*(?:true|false)\s*\])$/;
   return pattern.test(input.trim().replace(/[\[\]:]/g, ''));
 }
-export function isTPosition(anchor: any): anchor is TPosition {
-  if (typeof anchor !== 'object' || anchor === null) return false;
-  if (typeof anchor.x !== 'number' || Number.isNaN(anchor.x)) return false
-  if (typeof anchor.y !== 'number' || Number.isNaN(anchor.y)) return false
-  return Object.keys(anchor).length === 2;
+export function isTPosition(anchor: any): { x: number, y: number } | boolean {
+  let res = true
+  if (typeof anchor !== 'object' && !Array.isArray(anchor) || Object.keys(anchor).length !== 2 || anchor === null) {
+    return false;
+  } else {
+    let [a, b] = Array.isArray(anchor) ? anchor : [anchor.x, anchor.y];
+    if (typeof a !== 'number' || Number.isNaN(a)) {
+      res = false
+    }
+    if (typeof b !== 'number' || Number.isNaN(b)) {
+      res = false
+    }
+    return res ? { x: a, y: b } : false
+  }
 }
 export function isTStick(stick: any) {
   if (stick === undefined) {
     return false
   }
-  return /(left|rightabove|below)/.test(stick)
+  return /(left|right|above|below)/.test(stick)
 }
 
 export function isTOnCloseThrowable(onclose: any) {
@@ -70,7 +101,7 @@ export function isTHideOnThrowable(hideon: any) {
   if (hideon !== 'mouseleave') {
     throwErr('HideOn should be mouseleave or undefined')
   }
-  return hideon // as only mouseout is involved 
+  return hideon // as only mouseout is involved
 }
 
 export function throwErr(msg: string) {

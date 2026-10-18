@@ -11,15 +11,16 @@
 </svelte:head>
 <nav>
 	<a href="/crinput-text">CRInputText</a>
-	<a href="/phone-gemini">Phone Gemini</a>
+	<a href="/phone-number">Phone Number</a>
 	<a href="/crradio-group">CRRadioGroup</a>
 	<a href="/crcheckbox-group">CRCheckboxGroup</a>
 	<a href="/crcontext-menu">CRContextMenu</a>
 	<a href="/styling-child">Styling Child</a>
 	<a href="/t-css-vars-from-markup">Markup css var</a>
 	<a href="/test-page">Test Page</a>
-	<a href="/tooltip">Reactive Tooltip</a>
-	<a href="/tooltip-grok">Reactive Grok Tooltip</a>
+	<!-- <a href="/tooltip">Reactive Tooltip</a> -->
+	<!-- <a href="/tooltip-grok">Reactive Grok Tooltip</a> -->
+	<a href="/models-handler">Models Handler</a>
 </nav>
 {@render children()}
 

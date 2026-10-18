@@ -155,7 +155,10 @@
 	) {
 		try {
 			timeout = timeout_;
-			if (tooltipEl !== undefined) return;
+			if (tooltipEl !== undefined) {
+				tooltipEl.style.opacity='1'
+				return;
+			}
 
 			// Store configurations into reactive state blocks
 			preferredStick = stick;
@@ -246,6 +249,11 @@
 			return tooltipEl;
 		} catch (err: unknown) {
 			console.error('showTooltip failed:', err);
+		}
+	}
+	export function hide(){
+		if(tooltipEl){
+			tooltipEl.style.opacity='0'
 		}
 	}
 </script>

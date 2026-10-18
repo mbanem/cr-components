@@ -76,6 +76,7 @@
 	String.prototype.capitalize = function (this: string) {
 		return capitalize(this);
 	};
+
 	// NOTE: enter non breaking unicode space:
 	// Press Ctrl+Shift+U, type 00a0, and then press Enter or Space.
 	// here we held between apostrophes three non breaking spaces

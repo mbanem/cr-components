@@ -1,11 +1,15 @@
 /* src/styles/components.scss */
 @use './variables' as *;
 @use './mixins' as *;
+
 /* CR INPUT CONTAINER */
+.grid-container {
+  width: 20rem;
+}
 
 .cr-input-container {
   display: inline-block;
-  width: clamp(16rem, 18.3rem, 30rem);
+  width: clamp(16rem, 18rem, 30rem);
   margin: 0 0 1rem 0;
   font-family: $cr-font-family;
 }
@@ -15,6 +19,7 @@
 .cr-input-container .input-wrapper {
   position: relative;
   margin-top: 1.25rem;
+  width: 100%;
 }
 
 /*  Radio WRAPPER */
@@ -124,7 +129,7 @@
   /* Covers the border line behind the text */
   font-size: 0.85rem;
   opacity: 1;
-  color: green;
+  color: blue;
   /* $cr-label-focus-color;*/
 }
 
@@ -162,9 +167,10 @@
 
 .cr-input-container .error-text {
   color: tomato;
-  font:
-    italic 10px/2.1 Arial,
-    sans-serif;
+  font-family: sans-serif;
+  font-size: 12px !important;
+  line-height: 16px;
+  margin-top: 1px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

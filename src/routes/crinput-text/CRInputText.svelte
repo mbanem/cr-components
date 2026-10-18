@@ -56,7 +56,7 @@
 		minLength: Number(minLength),
 		maxLength: Number(maxLength)
 	});
-	const minLengthError = `Must be at least ${s.minLength} characters`;
+	const minLengthError = `Must be at least ${s.minLength} characters and this is a very big message abowe the limit`;
 	const maxLengthError = `Must be at most ${s.maxLength} characters`;
 	let errorMessage = $derived.by(() => {
 		if (!s.isDirty && !s.isFocused) return '';
@@ -70,6 +70,13 @@
 				: '';
 	});
 
+	let inputEl: HTMLInputElement | undefined = undefined;
+	let inTheMiddle = $derived.by(() => {
+		if (!inputEl || inputEl.selectionEnd === null) {
+			return false;
+		}
+		return inputEl.selectionEnd < value.length;
+	});
 	let prettyLabel = $derived(capitalizeText(label));
 	let isLabelFloating = $derived(value || s.isFocused || errorMessage.length > 0 || s.placeholder);
 	let hasError = $derived(Boolean(errorMessage) && errorMessage === minLengthError);
@@ -85,39 +92,54 @@
 
 		value = capitalizeText(value + cap);
 		s.isDirty = true;
-		dispatchValue('paste' as TReportOn);
+		dispatchValue('paste' as TSingleReportOn);
 	}
-	function dispatchValue(triggerEvent: TReportOn) {
-		if (!onValueChange) return;
 
-		let triggers: string[] = [];
+	// this is a runtime parser so thereis not TypeScript here
+	export function parseTriggers(reportOn: TReportOnInput): TSingleReportOn[] {
+		let rawTriggers: string[] = [];
 
 		if (Array.isArray(reportOn)) {
-			triggers = reportOn;
+			rawTriggers = reportOn as TSingleReportOn[];
 		} else if (typeof reportOn === 'string') {
-			triggers = reportOn.split('|').map((t) => t.trim());
+			rawTriggers = reportOn.split('|').map((t) => t.trim());
 		}
 
-		if (triggers.includes(triggerEvent)) {
+		// This safely discards unrecognized random strings
+		return rawTriggers.filter((t): t is TSingleReportOn =>
+			VALID_EVENTS.includes(t as TSingleReportOn)
+		);
+	}
+	function dispatchValue(reportOn: TSingleReportOn) {
+		if (!onValueChange) return;
+
+		const triggers = parseTriggers(reportOn);
+
+		// if (triggers.length === 0) {
+		// 	console.warn('No valid report triggers found for:', reportOn);
+		// 	return;
+		// }
+		if (triggers.includes(reportOn)) {
 			onValueChange(value);
 		}
 	}
 
 	function handleInput(e: Event) {
 		const el = e.target as HTMLInputElement;
+		if (!inTheMiddle) {
+			let newValue = el.value;
 
-		let newValue = el.value;
+			if (capitalize === 'lowercase') {
+				newValue = newValue.toLowerCase();
+			} else if (capitalize === 'uppercase') {
+				newValue = newValue.toUpperCase();
+			} else if (capitalize === 'capitalize') {
+				newValue = capitalizeText(newValue);
+			}
 
-		if (capitalize === 'lowercase') {
-			newValue = newValue.toLowerCase();
-		} else if (capitalize === 'uppercase') {
-			newValue = newValue.toUpperCase();
-		} else if (capitalize === 'capitalize') {
-			newValue = capitalizeText(newValue);
-		}
-
-		if (value !== newValue) {
-			value = newValue;
+			if (value !== newValue) {
+				value = newValue;
+			}
 		}
 		// if (reportOn.includes(e.type)) {
 		dispatchValue(e.type as TReportOn);
@@ -164,6 +186,7 @@
 <div class={`cr-input-container ${className} ${isDisabled ? 'disabled' : ''}`}>
 	<div class="input-wrapper">
 		<input
+			bind:this={inputEl}
 			type="text"
 			bind:value
 			class="cr-input"

@@ -1,5 +1,21 @@
 <script lang="ts">
 	import Child from './Child.svelte';
+	import PostList from '$lib/components/PostList.svelte';
+	type PostAuthor = {
+		id: string;
+		title: string;
+		content: string;
+		author: boolean;
+		categoryIds: string;
+		categoryNames: string;
+		authorId: string;
+		published: boolean;
+		firstName: string;
+		lastName: string;
+		role: string;
+		createdAt: Date;
+		updatedAt: Date;
+	}
 </script>
 
 <!-- Parent.svelte -->

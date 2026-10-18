@@ -2,11 +2,11 @@ import { ECDH } from 'crypto';
 import { threadCpuUsage } from 'process';
 import { tick } from 'svelte';
 import { runInThisContext } from 'vm';
-import type { TStick, TLaunchEvent, TSHE, TSHL, TSHC, TOnClose, THovered, ITooltipOptions } from '$lib/types/tooltip-args'
+import type { TStick, TLaunchEvent, TSHE, TSHL, TSHC, TOnClose, THovered, TTooltipOptions } from '$lib/types/tooltip-args'
 
 
 
-export class CRReactiveTooltip {
+export class ReactiveTooltip {
   private _anchor: HTMLElement | undefined
   private abortController: AbortController;
   private tooltipEl: HTMLElement | undefined;
@@ -22,7 +22,7 @@ export class CRReactiveTooltip {
   private scrollHandler?: () => void;
   private autoCloseTimer?: ReturnType<typeof setTimeout>;
 
-  constructor(options: ITooltipOptions) {
+  constructor(options: TTooltipOptions) {
     const {
       anchor,
       content,
@@ -108,7 +108,7 @@ export class CRReactiveTooltip {
       this.anchorRect = anchor.getBoundingClientRect()
     }
   }
-  public set showHide(sh: TShowHide) {
+  public set showHide(sh: TShowH) {
     if (typeof sh === 'number') {
       this.timeout = sh as number
     } else if (typeof sh === 'string') {

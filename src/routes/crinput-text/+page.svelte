@@ -10,7 +10,7 @@
 	}
 
 	function isErroneous(value: string): string {
-		return value.length > 1 ? '' : 'must have at least two chars in\nlength and not less than that';
+		return value.length > 1 ? '' : 'must have at least two chars\nin length and not less than that';
 	}
 </script>
 

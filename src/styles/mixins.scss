@@ -81,8 +81,7 @@
 }
 
 @mixin page-info($caption-color: 'navy', $font-size: 15px, $top: 0) {
-  @include container($caption: 'What Does This Page Do?',
-    $caption-color: $caption-color,
+  @include container($caption-color: $caption-color,
     $font-size: $font-size,
     $top: $top );
 
