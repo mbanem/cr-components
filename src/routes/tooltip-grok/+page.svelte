@@ -131,12 +131,12 @@
 	let optButton: HTMLButtonElement | undefined = undefined;
 
 	function wakeUp(eventStr?: string, inners?: string) {
-		log('wakeUp called', eventStr, inners);
+		console.log('wakeUp called', eventStr, inners);
 		if (optButton) {
 			optButton.innerText = 'wake up tooltip';
 			Object.assign(optButton.style, { color: 'white', backgroundColor: 'navy' });
 		} else {
-			log('no optButton');
+			console.log('no optButton');
 		}
 	}
 
@@ -155,10 +155,10 @@
 	let explanation = $state(false);
 	function toggleExplanation() {
 		if (explanation) {
-			log('calling true');
+			console.log('calling true');
 			ReactiveTooltip.optionsToClipboard(true);
 		} else {
-			log('calling false');
+			console.log('calling false');
 			ReactiveTooltip.optionsToClipboard();
 		}
 		explanation = !explanation;

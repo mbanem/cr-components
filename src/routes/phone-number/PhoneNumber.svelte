@@ -1,48 +1,22 @@
-<script lang="ts" module>
-	const commaKeyMessage = 'press comma key for extension';
-	export const phoneFormat =
-		'in format xxx-xxx-xxxx, ext. xx\nwith text-overflow: ellipsis;\nfor demonstration purposes';
-	export const REFORMAT = 'DONE? Hit Enter to reformat';
-	export const REQUIRED = 'Entry is required';
-	export const WRONGDROPMSG = 'dropped data invalid';
-	export const isGreen = new RegExp(/(press comma|DONE\?)/);
-	export const MAXLENGTHMSG = 'maximum length reached';
-	export const MAXLENGTH = 24;
-
-	export function capitalizeText(str: string): string {
-		return str
-			.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-			.replace(/\b\w/g, (char) => char.toUpperCase());
-	}
-
-	// export function formatPhoneNumber(rawValue: string): string {
-	// 	const digits = rawValue.replace(/\D/g, '');
-	// 	const mainDigits = digits.slice(0, 10);
-	// 	const extDigits = digits.slice(10, 15);
-
-	// 	let formatted = mainDigits;
-
-	// 	// Progressive formatting: append dash as soon as 3 or 6 digits are reached
-	// 	if (mainDigits.length >= 6) {
-	// 		formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3, 6)}-${mainDigits.slice(6)}`;
-	// 	} else if (mainDigits.length >= 3) {
-	// 		formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3)}`;
-	// 	}
-
-	// 	// Handle extension triggering
-	// 	if (rawValue.includes(',') || extDigits.length > 0) {
-	// 		formatted += `, ext. ${extDigits}`;
-	// 	}
-
-	// 	return formatted;
-	// }
-</script>
-
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { setCssVarColor, formatPhoneNumber } from '$lib/utils/client-helpers';
+	// import { phoneFormat } from '$lib/constants';
+	// import { setCssVarColor, formatPhoneNumber } from '$lib/utils/client-helpers';
+	import { setCssVarColor, formatPhoneNumber, isPhoneFormatOK, capitalizeText } from '$lib/utils';
+	import { getCountryCodesMap, type TCountryName, type TCountryCodes } from './country-codes';
+
+	const commaKeyMessage = 'press comma key for extension';
+	const phoneFormat =
+		'in format xxx-xxx-xxxx, ext. xx\nwith text-overflow: ellipsis;\nfor demonstration purposes';
+	export const REFORMAT = 'DONE? Hit Enter to reformat';
+	export const WRONGDROPMSG = 'dropped data invalid';
+	export const isGreen = new RegExp(/(press comma|DONE\?)/);
+	export const noPhoneDialRequired = 'No phone Dial Code required';
+	export const MAXLENGTHMSG = 'maximum length reached';
+	export const MAXLENGTH = 24;
 
 	interface PROPS extends Partial<HTMLInputAttributes> {
 		label: string;
@@ -52,6 +26,8 @@
 		isDisabled?: boolean;
 		isRequired?: boolean;
 		isErroneous?: (val: string) => string;
+		allowCountryCodes?: boolean;
+		countryCode?: string;
 	}
 
 	// 	// ✅ Valid: Piped string formats
@@ -65,7 +41,7 @@
 	// const badString: TReportOn = 'Enter|imput|change';
 	// const badArray: TReportOn = ['Enter', 'imput', 'change'];
 	let {
-		label,
+		label, // sent by parent as phoneNumber but capitalized into Phone Number
 		reportOn = 'keyup|Enter|blur', //['keyup', 'Enter', 'blur'],
 		onValueChange,
 		value = $bindable(''),
@@ -73,36 +49,54 @@
 		isDisabled = false,
 		isRequired = false,
 		isErroneous,
+		allowCountryCodes = false,
+		countryCode = '',
+
 		...restProps
 	}: PROPS = $props();
 	let inputEl: HTMLInputElement | undefined = undefined;
+	let countryCodesEl: HTMLInputElement | undefined = undefined;
+	export type CountrySelection = {
+		countryName: string;
+		dialCode: string;
+	};
+	let countryCodesRequired = $derived(allowCountryCodes);
 
+	let REQUIRED = $derived(isRequired ? 'Entry is required' : '');
+	let REQUIRED_CODEBOX = $derived.by(() => {
+		// await tick();
+		if (!allowCountryCodes) {
+			// await tick();
+			return REQUIRED;
+		}
+		inputEl?.offsetHeight;
+		return REQUIRED + ' (Ctrl+C for DialCode)';
+	});
+
+	let countryCodesMap: SvelteMap<TCountryName, TCountryCodes>;
 	let selectionStart = $derived.by(() => {
-		if (!inputEl) return 0;
+		if (!inputEl) {
+			return 0;
+		}
 		return inputEl?.selectionStart as number;
 	});
-	// let selectionEnd = $derived.by(() => {
-	// 	if (!inputEl) return 0;
-	// 	return inputEl?.selectionStart as number;
-	// });
-	// $effect(() => {
-	// 	selectionStart = inputEl?.selectionStart as number;
-	// 	selectionEnd = inputEl?.selectionEnd as number;
-	// });
-	// states for managing what CSS classes become active
-	// like label translating up/down based on  isFocused
-	// message apperance based on isDirty
-	// placehodler holding tetxt or being empty and
-	// reformat forcing special message when updating in the
-	// middle part of phone number destroying the format
-	let s = $state({
+	export type TS = {
+		isFocused: boolean;
+		isDirty: boolean;
+		placeholder: string;
+		reformat: string;
+	};
+	const s = $state({
 		isFocused: false,
 		isDirty: false,
 		placeholder: '',
 		reformat: ''
 	});
-	let maxLengthMsg = $state(MAXLENGTHMSG);
-	let wrongDropMsg = $state('');
+
+	let isCountryCodeSearchOn = $state(false);
+	let countrySearchName = $state('');
+	let maxLengthMsg = $state('');
+	let wrongActionMsg = $state('');
 	const log = console.log;
 	let imgPath = '/phone-number-setup.png';
 	let timer: ReturnType<typeof setTimeout>;
@@ -112,7 +106,9 @@
 	let valueBeforeInTheMiddle = '';
 
 	function checkCaretPosition() {
-		if (!inputEl) return;
+		if (!inputEl) {
+			return;
+		}
 
 		const start = inputEl.selectionStart ?? 0;
 		const end = inputEl.selectionEnd ?? 0;
@@ -124,43 +120,53 @@
 			if (!valueBeforeInTheMiddle) {
 				valueBeforeInTheMiddle = value;
 			} else if (valueBeforeInTheMiddle !== value) {
-				s.reformat = REFORMAT;
+				s.reformat = isPhoneFormatOK(value, s) ? '' : REFORMAT;
 			}
 			s.isDirty = true;
 		} else {
 			valueBeforeInTheMiddle = '';
 		}
 	}
-	function isValid() {
-		return /^(\d{3})-\d{3}-\d{4}$|^\d{3}-\d{3}-\d{4}, ext\. \d{1,5}$/.test(value);
-	}
 	function clearMaxLengthMsg() {
-		maxLengthMsg = wrongDropMsg = '';
+		maxLengthMsg = wrongActionMsg = '';
 	}
+
 	let errorMessage = $derived.by(() => {
-		if (!s.isDirty && !s.isFocused) return ''; // inital page state
+		if (!s.isDirty && !s.isFocused && !wrongActionMsg) {
+			return '';
+		}
+
 		if (value.length === 12 && inputEl?.selectionStart === 12) {
 			return s.isFocused ? commaKeyMessage : '';
 		}
-		if (s.isDirty && s.isFocused && !value) {
+		if (s.isDirty && s.isFocused && !value && !(maxLengthMsg || wrongActionMsg)) {
 			return '';
 		}
 		if (s.reformat) {
 			// 			log('errorMessage REFORMAT');
-			return REFORMAT;
+			return isPhoneFormatOK(value, s) ? '' : REFORMAT;
 		}
-		if ((value.length === MAXLENGTH && maxLengthMsg) || wrongDropMsg) {
-			// log('trying maxlength');
+		if ((value.length === MAXLENGTH && maxLengthMsg) || wrongActionMsg) {
+			console.log('maxLength?', value.length);
 			setTimeout(() => {
 				clearMaxLengthMsg();
 			}, 2000);
-
-			return wrongDropMsg ?? maxLengthMsg;
+			console.log('replacement', maxLengthMsg ?? wrongActionMsg);
+			return wrongActionMsg || maxLengthMsg; // precedence
 		}
 		return s.reformat ? s.reformat : isErroneous ? isErroneous(value) : '';
 	}) as string;
 
-	let prettyLabel = $derived(capitalizeText(label));
+	function countryCodesToOpen() {
+		return !s.isDirty && !s.isFocused && !value ? ' (Ctrl+C for DialCode)' : '';
+	}
+	let prettyLabel = $derived.by(() => {
+		if (isCountryCodeSearchOn) {
+			return 'Country Name -> Phone Dial';
+		}
+		// prop got from parent as 'phoneNumber' capitalized into Phone Number
+		return capitalizeText(label) + countryCodesToOpen();
+	});
 	let isLabelFloating = $derived(
 		s.isFocused || value.length > 0 || errorMessage.length > 0 || s.placeholder
 	);
@@ -188,87 +194,70 @@
 	function handleDragover(e: DragEvent) {
 		e.preventDefault();
 	}
-	function handleDrop(e: DragEvent) {
+	function setPlaceholder(color: string = 'chrimson') {
+		setCssVarColor('--cr-input-placeholder-color', color);
+		s.placeholder = REQUIRED_CODEBOX;
+		// inputEl?.blur();
+		// inputEl?.focus();
+	}
+	async function handleDrop(e: DragEvent) {
 		inputEl?.focus();
-		log('handleDrop entry');
+		console.log('handleDrop entry');
 		// 1. Get plain text from clipboard
 		const droppedText = e.dataTransfer?.getData('text') || '';
-		// log('droppedText', droppedText);
+		console.log('droppedText', droppedText);
 		// 2. Extract digits only
 		const digits = droppedText.replace(/\D/g, '');
-		log('digits?', digits, !digits);
 		if (!digits) {
 			e.preventDefault();
-			log('no digits preventDefault');
-			setCssVarColor('--cr-input-placeholder-color', 'crimson');
-			s.placeholder = REQUIRED;
-			wrongDropMsg = WRONGDROPMSG;
+			setPlaceholder();
+			wrongActionMsg = WRONGDROPMSG;
 			return;
 		}
 
 		s.isDirty = true;
-
-		const mainDigits = digits.slice(0, 10);
-		const extDigits = digits.slice(10, 15);
-
-		// 3. Format the main phone number
-		let formatted = mainDigits;
-		if (mainDigits.length >= 6) {
-			formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3, 6)}-${mainDigits.slice(6)}`;
-		} else if (mainDigits.length >= 3) {
-			formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3)}`;
-		}
-
-		// 4. Attach extension if more than 10 digits were pasted or if 'ext' was in the text
-		const hasExtKeyword = /ext|x|,/i.test(droppedText);
-		if (extDigits.length > 0 || (mainDigits.length === 10 && hasExtKeyword)) {
-			formatted += `, ext. ${extDigits}`;
-		}
-
-		// 5. Update Svelte state
-		value = formatted;
-
-		// 6. Move cursor to the end of the newly formatted string
-		tick().then(() => {
-			const input = e.target as HTMLInputElement;
-			input.setSelectionRange(value.length, value.length);
-		});
+		let value = formatPhoneNumber(digits, s);
 		if (reportOn.includes('paste')) {
 			dispatchValue('paste' as TSingleReportOn);
 		}
 	}
-	function handleInput(e: Event | KeyboardEvent) {
-		log(e.type, inputEl?.value, value);
-		log('handleInput entry', value);
-		// if (isInTheMiddle) return;
-		// if (s.reformat) {
-		// 	// log('handleInput reformat');
-		// 	return;
-		// }
+	function handleInput(e: KeyboardEvent) {
+		// console.log('handleInput', e.type, inputEl?.value, value);
+		// console.log('handleInput entry', value);
+
 		const el = e.target as HTMLInputElement;
 		const rawValue = el.value;
+		// console.log(rawValue.startsWith(' '));
 		const oldCursor = el.selectionStart || 0;
 
 		const digitsBeforeCursor = rawValue.slice(0, oldCursor).replace(/\D/g, '').length;
-		const formatted = formatPhoneNumber(rawValue);
+		console.log('handleInput rawValue', rawValue);
+		const formatted = formatPhoneNumber(rawValue, s);
+		console.log(formatted.startsWith(' '));
+		console.log('handleInput formatted', formatted);
 
-		if (isInTheMiddle && e.key !== 'Backspace') {
+		if (isInTheMiddle && !'Backspace|Delete'.includes(e.key)) {
 			return;
 		}
 		if (!isInTheMiddle) {
 			value = formatted;
+			console.log('formatted--> value', value);
 		}
-		if (value.length > 0) s.isDirty = true;
+		if (value.length > 0) {
+			s.isDirty = true;
+		}
 
 		tick().then(() => {
 			let newCursor = 0;
 
 			// Case A: Just appended ", ext. " -> jump cursor to the very end
-			if (formatted.endsWith(', ext. ')) {
+			if (value.endsWith(', ext. ')) {
 				newCursor = formatted.length;
+				console.log('ends with , ext. new caret', newCursor);
 			}
 			// Case B: General digit-mapping cursor tracking
 			else {
+				console.log('does not ends with ext');
 				let digitCount = 0;
 				for (let i = 0; i < formatted.length; i++) {
 					if (/\d/.test(formatted[i])) digitCount++;
@@ -297,11 +286,24 @@
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
+		// console.log('handleKeydown', e.type, e.key, e.ctrlKey);
+		maxLengthMsg = '';
+		if (e.ctrlKey && 'cC'.includes(e.key)) {
+			console.log('Ctrl+C  handler');
+			if (allowCountryCodes) {
+				log('allowCountryCodes', allowCountryCodes);
+				activateCountryCodesBox();
+			} else {
+				log('allowCountryCodes', allowCountryCodes);
+				// maxLengthMsg = '';
+				wrongActionMsg = noPhoneDialRequired;
+			}
+		}
 		// log('handleKetdown entry', value);
 		const el = e.target as HTMLInputElement;
 
 		// if maximum number of characters is reached ignore keystrokes
-		if (value.length === MAXLENGTH && e.key !== 'Backspace') {
+		if (value.length === MAXLENGTH && !'Backspace|ArrowLeft|ArrowRight|Delete'.includes(e.key)) {
 			maxLengthMsg = MAXLENGTHMSG;
 			e.preventDefault();
 			return;
@@ -314,7 +316,7 @@
 				return new Promise((resolve) => setTimeout(resolve, 300));
 			});
 			// log('enter & reformat');
-			value = formatPhoneNumber(el.value);
+			value = formatPhoneNumber(el.value, s);
 			const pos = el.value.length;
 			el.setSelectionRange(pos, pos);
 			return;
@@ -326,6 +328,7 @@
 			const isAtEnd = el.selectionStart === value.length;
 			// Only allow comma if we have 10 digits and the cursor is at the very end
 			if (digits.length === 10 && isAtEnd && !value.endsWith(',')) {
+				value += ' ext. ';
 				// log('handleKeydown comma in right place');
 				return; // Allow comma insertion
 			}
@@ -334,15 +337,14 @@
 		}
 
 		// 1. Atomic Backspacing for ", ext. "
-		if (e.key === 'Backspace') {
+		if ('Backspace|Delete'.includes(e.key)) {
 			// log('handleKeydown backspace');
 			if ((el.selectionStart as number) <= 12) {
 				if (el.value.length > 12) {
-					if (isValid()) {
+					if (isPhoneFormatOK(value, s)) {
 						// log('handleKeydown clear reformat');
 						s.reformat = '';
 					} else {
-						// 						log('keydown inside number REFORMAT');
 						s.reformat = REFORMAT;
 						s.isDirty = true;
 					}
@@ -396,7 +398,7 @@
 			// log('handleKeyup reformat');
 			return;
 		}
-		if (e.key === 'Backspace') {
+		if ('Backspace|Delete'.includes(e.key)) {
 			// log('handleKeyup backspace');
 			if (/(, |-)$/.test(value)) {
 				// log('backspace 2 chars');
@@ -419,7 +421,9 @@
 		}
 		if (!isInTheMiddle) {
 			// log('handleKeyup format');
-			value = formatPhoneNumber(value);
+			console.log(value.startsWith(' '));
+			value = formatPhoneNumber(value, s);
+			console.log(value.startsWith(' '));
 		}
 
 		onValueChange?.(value);
@@ -430,7 +434,7 @@
 		// log('handleKeyup exit', value);
 	}
 
-	function handleBlur(e: FocusEvent) {
+	async function handleBlur(e: FocusEvent) {
 		// log('handleBlur');
 		s.isFocused = false;
 		s.isDirty = true; // at this state do not show message
@@ -440,7 +444,7 @@
 		});
 		if (!value) {
 			// 			log('blur set REQUIRED');
-			s.placeholder = REQUIRED;
+			s.placeholder = REQUIRED_CODEBOX;
 			setCssVarColor('--cr-input-placeholder-color', 'crimson');
 		}
 		tick().then(() => {
@@ -452,15 +456,14 @@
 	}
 
 	function handleFocus(e: FocusEvent) {
-		// log('handleFocus');
-		// if (s.placeholder) {
-		// s.isDirty = false;
 		s.isFocused = true;
 		if (value.length === 12 && inputEl?.selectionStart === 12) {
-			// log('focus 12');
 			s.isDirty = true;
 		}
-		setCssVarColor('--cr-label-focus-color', '0066cc');
+
+		// const color = !value ? 'crimson' : '0066cc';
+		setPlaceholder(!value ? 'crimson' : '0066cc');
+
 		tick().then(() => {
 			return new Promise((resolve) => setTimeout(resolve, 300));
 		});
@@ -470,10 +473,73 @@
 		}
 		// log('fandleFocus isDirty?', s.isDirty);
 	}
+	let selectedCode = $state('+381');
+
+	function handleCountrySelect(code: string) {
+		selectedCode = code;
+		console.log('code', code);
+	}
+	onMount(() => {
+		console.log(!s.isDirty, !s.isFocused, !value);
+	});
+
+	let countryCandidates = $derived.by(() => {
+		if (!countrySearchName || countrySearchName.length === 1) {
+			console.log('$derived -- no search', value);
+			return '';
+		}
+		return Array.from(countryCodesMap.keys()).filter((countryName) =>
+			countryName.toLowerCase().startsWith(countrySearchName.toLowerCase())
+		);
+	}) as string[];
+	function searchCountryName() {
+		// console.log('searchCountry');
+		if (!countryCandidates) {
+			console.log('no countryCandidates');
+			return;
+		}
+		// console.log('countryCandidates', countryCandidates);
+		if (countryCandidates.length > 1) {
+			countryCandidates.forEach((countryName) => {
+				const d = countryCodesMap.get(countryName);
+				// console.log(countryName, countryCodesMap.get(countryName));
+			});
+		} else {
+			const dial = countryCodesMap.get(countryCandidates[0]);
+			// console.log(countryCandidates[0], dial);
+			wrongActionMsg = 'DielCode for ' + countryCandidates[0];
+			countryCodesEl!?.blur();
+			value = (dial?.dialCode as string) + ' ' + value;
+		}
+	}
+	function countryCodesKeyup(e: KeyboardEvent) {
+		if (countrySearchName.length === 1) {
+			return;
+		}
+	}
+	function countryCodesBlur(e: FocusEvent) {
+		isCountryCodeSearchOn = false;
+		countryCodesEl!.style.zIndex = '-1';
+		countryCodesEl!.style.opacity = '0';
+		// inputEl!.style.opacity = '1';
+	}
+	async function activateCountryCodesBox() {
+		console.log('activateCountryCodesBox');
+		if (!countryCodesMap) {
+			countryCodesMap = getCountryCodesMap();
+		}
+		// inputEl!.style.opacity = '0';
+		await tick();
+		countryCodesEl!.style.opacity = '1';
+		isCountryCodeSearchOn = true;
+		await tick();
+		// countryCodesEl!.style.zIndex = '101';
+		countryCodesEl?.focus();
+	}
 </script>
 
 <p>
-	middle {isInTheMiddle} value {value}
+	middle {isInTheMiddle} value {value} cc required {countryCodesRequired} searchOn {isCountryCodeSearchOn}
 </p>
 <div class="grid-container">
 	<div class={`cr-input-container ${className} ${isDisabled ? 'disabled' : ''}`}>
@@ -511,7 +577,17 @@
 				}}
 				placeholder={s.placeholder}
 			/>
-
+			<input
+				class="country-codes"
+				class:allow-codes={isCountryCodeSearchOn}
+				bind:value={countrySearchName}
+				bind:this={countryCodesEl}
+				type="text"
+				placeholder="Start entering country name"
+				onkeyup={countryCodesKeyup}
+				oninput={searchCountryName}
+				onblur={countryCodesBlur}
+			/>
 			<label for="idSpan" class="floating-label" class:floating={isLabelFloating}>
 				<span id="idSpan" class="label-text" class:floating={isLabelFloating}>
 					{prettyLabel}
@@ -530,7 +606,7 @@
 		</div>
 	</div>
 
-	<div class="thumbnail-wrapper">
+	<div class="thumbnail-wrapper" data-caption="Parent Block">
 		<img
 			src={imgPath}
 			alt="Instantiation code snippet summary"
@@ -559,6 +635,15 @@
 </div>
 
 <style lang="scss">
+	/* redefined out from components.scss*/
+	.input-wrapper {
+		position: relative;
+		.cc-wrapper {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+	}
 	input::placeholder {
 		color: var(--cr-input-placeholder-color);
 	}
@@ -586,6 +671,15 @@
 		aspect-ratio: 400 / 300;
 		border-radius: 8px;
 	}
+	.label-text {
+		display: inline-block;
+		width: max-content;
+		background-color: white;
+		z-index: 10;
+		&.counntry-codes {
+			display: none;
+		}
+	}
 	.overlay-img {
 		@extend %overlay-dimensions;
 		z-index: 100;
@@ -598,5 +692,42 @@
 		z-index: 101;
 		background: transparent;
 		cursor: zoom-out;
+	}
+	.cr-input {
+		position: relative;
+		opacity: 1;
+		z-index: 2;
+	}
+	.cr-input.allow-codes {
+		opacity: 0;
+		z-index: 0;
+	}
+	.country-codes {
+		position: absolute;
+		top: -2.1rem;
+		left: 0;
+		opacity: 0;
+		width: 18rem;
+		position: relative;
+		// padding-left: 0;
+		// border: 3px solid blue;
+		padding-left: 1rem;
+		border: 1px solid gray;
+		// z-index: -1;
+		// &::before {
+		// 	position: absolute;
+		// 	content: var(--country-candidates);
+		// 	top: 2rem;
+		// 	left: 0;
+		// }
+		&::placeholder {
+			color: lightgreen;
+		}
+	}
+	.country-codes.allow-codes {
+		opacity: 1;
+		z-index: 3;
+		// &::before {
+		// }
 	}
 </style>

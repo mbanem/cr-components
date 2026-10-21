@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { capitalize } from '$lib/utils';
+	import { capitalizeText } from '$lib/utils';
 	let images = ['bird.webp', 'cat.webp', 'lake.jpg', 'bridge.jpg', 'eiffel-tower.jpg'];
-
+	console.log('something');
 	// let boxSize = $state(25);
 	let hoverImg: string | null = null;
 	let cursorX = 0;
@@ -45,7 +45,7 @@
 		//   backgroundPosition: `${bgX}px ${bgY}px`,
 		// };
 	}
-	console.log('john doe'.capitalize());
+	console.log(capitalizeText('john doe'));
 </script>
 
 <div class="grid">

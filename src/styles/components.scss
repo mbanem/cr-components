@@ -2,7 +2,6 @@
 @use './variables' as *;
 @use './mixins' as *;
 
-/* CR INPUT CONTAINER */
 .grid-container {
   width: 20rem;
 }
@@ -14,17 +13,14 @@
   font-family: $cr-font-family;
 }
 
-/*  INPUT WRAPPER */
-
 .cr-input-container .input-wrapper {
   position: relative;
-  margin-top: 1.25rem;
+  margin-top: 0rem;
   width: 100%;
 }
 
-/*  Radio WRAPPER */
 .cr-input-container .radio-wrapper {
-  @include container($caption: 'Select a Product',
+  @include container($caption: 'Not Specified',
     $color: navy,
     $caption-color: navy,
     $left: 1.7rem);
@@ -61,41 +57,24 @@
   color: $cr-disabled-color;
 }
 
-/* 
- INPUT
- */
-
-.cr-input-container .cr-input {
+.cr-input-container .cr-input,
+.country-codes {
   @include cr-input-base;
 }
-
-
-/* 
- INPUT :FOCUS
- */
 
 .cr-input-container .cr-input:focus {
   @include cr-input-focus;
 }
 
-
-/* 
- PLACEHOLDER
- */
-
 .cr-input-container .cr-input::placeholder {
   @include cr-input-placeholder;
 }
 
-
-/* 
- FLOATING LABEL - BASE (Placeholder state)
- */
-
+/* positioning label playground */
 .cr-input-container .floating-label {
   position: absolute;
   left: 0.75rem;
-  top: 50%;
+  top: 20%;
   transform: translateY(-50%);
   /* Centered inside input like a true placeholder */
   background: transparent;
@@ -115,55 +94,38 @@
   max-width: calc(100% - 1.5rem);
   display: flex;
   white-space: nowrap;
+  z-index: 4;
 }
 
-/* 
- FLOATING LABEL - ACTIVE (Floated on top border)
- */
-
 .cr-input-container .floating-label.floating {
-  top: 0;
-  transform: translateY(-75%);
+  top: -1rem;
+  transform: translateY(8%);
   /* Keeps it vertically centered on the top border */
   background: $cr-label-background;
   /* Covers the border line behind the text */
   font-size: 0.85rem;
   opacity: 1;
   color: blue;
-  /* $cr-label-focus-color;*/
 }
 
 .cr-input-container .floating-label {
   color: $cr-label-color;
 }
 
-/* 
- FLOATING LABEL - ERROR
- */
-
 .cr-input-container .cr-input.has-error~.floating-label.floating {
   color: $cr-input-error-color;
 }
 
-
-/* 
- LABEL TEXT
- */
-
 .cr-input-container .label-text {
   flex-shrink: 0;
-  /*color: var(cr-color-primary);*/
   color: $cr-input-placeholder-color;
-  /* TODO this makes problem comment it out*/
+  background-color: $cr-input-placeholder-background-color;
 }
 
 .cr-input-container .label-text.floating {
   color: $cr-label-focus-color;
+  background-color: $cr-input-placeholder-background-color;
 }
-
-/* 
- ERROR TEXT
- */
 
 .cr-input-container .error-text {
   color: tomato;
@@ -178,20 +140,9 @@
   cursor: help;
 }
 
-
-/* 
- ERROR INPUT
- */
-
 .cr-input-container .cr-input.has-error {
   color: $cr-input-color;
-  // border-color: $cr-input-error-color;
 }
-
-
-/* 
- DISABLED
- */
 
 .cr-input-container.disabled {
   opacity: $cr-input-disabled-opacity;

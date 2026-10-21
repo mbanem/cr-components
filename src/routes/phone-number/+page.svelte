@@ -1,4 +1,9 @@
 <script lang="ts">
+	import { phoneFormat } from '$lib/constants'; // TODO use this in production
+
+	// TODO remove this for production
+	// const phoneFormat =
+	// 	'in format xxx-xxx-xxxx, ext. xx\nwith text-overflow: ellipsis;\nfor demonstration purposes';
 	function phoneError(value: string): string {
 		const digits = value.replace(/\D/g, '');
 		const mainDigits = digits.slice(0, 10);
@@ -28,16 +33,17 @@
 
 		return '';
 	}
-
-	import PhoneNumber, { phoneFormat } from './PhoneNumber.svelte';
+	import PhoneNumber from './PhoneNumber.svelte';
 	let phoneNumber = $state('');
 	let currentValue = $state('');
 	function onValueChange(val: string) {
 		currentValue = val;
 	}
 	let sticky = 'display:inline-block;font-size:13px;letter-spacing:-1px;';
+	let cc = $state(true);
 </script>
 
+<button onclick={() => (cc = !cc)}>toggle countryCodes</button>
 <div class="demo-wrapper">
 	<PhoneNumber
 		label="phoneNumber"
@@ -46,11 +52,13 @@
 		{onValueChange}
 		isErroneous={phoneError}
 		isRequired={true}
+		allowCountryCodes={cc} // if none parent do not want area_code in phone number
 	/>
 	<div class="parent-block" data-caption="Parent Block">
 		<p style="margin-top:-6px;paddin:0;margin:0;">(111) 222-3333 x44</p>
 		<p style="paddin:0;margin:0;">222 444-3331 #44</p>
 		<p style="paddin:0;margin:0;">333 555-7779 ext 56</p>
+		<p>incorrect 46554 text 9984</p>
 		<p>
 			<span style:sticky>onValueChange</span>
 			{currentValue}

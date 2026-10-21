@@ -38,7 +38,8 @@
 
   &::before {
     position: absolute;
-    content: '\00a0\00a0' attr(data-caption, string, $caption) '\00a0\00a0';
+    // --caption: #{$caption};
+    content: '\00a0\00a0 '$caption '\00a0\00a0';
     top: $top;
     left: $left;
     width: auto; // Fixed: Let width fit the text content
@@ -50,6 +51,11 @@
     font-size: $font-size;
     font-weight: 500;
     white-space: nowrap; // Ensures caption never wraps
+  }
+
+  // Override the default only when data-caption is non-empty
+  &[data-caption]:not([data-caption=''])::before {
+    content: '\00a0\00a0' attr(data-caption) '\00a0\00a0';
   }
 }
 

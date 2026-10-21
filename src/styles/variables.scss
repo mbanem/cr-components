@@ -19,15 +19,17 @@ $cr-font-family: system-ui,
   --cr-input-error-color: #dc143c;
   --cr-radio-group-width: 19rem;
   --cr-disabled-color: #808080;
+
 }
 
-body {
+/*body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   position: relative;
 }
 
+*/
 // 2. SCSS Variable Abstractions (Convenient shortcuts for development)
 // $cr-placeholder: #{var(--cr-color-placeholder, #9ca3af)};
 $cr-color-primary: #{var(--cr-color-primary, #3b82f6)};
@@ -47,6 +49,7 @@ $cr-input-focus-border-color: #0066cc;
 $cr-input-focus-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
 
 $cr-input-placeholder-color: #{var(--cr-input-placeholder-color, #808080)};
+$cr-input-placeholder-background-color: #{var(--cr-input-placeholder-background-color, #ffffff)};
 $cr-input-placeholder-opacity: 0.5;
 
 $cr-input-color: black;

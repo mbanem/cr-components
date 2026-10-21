@@ -13,7 +13,7 @@
 	async function logm(message: string) {
 		await tick();
 		if (msg === undefined || msg.innerText === '') {
-			log(msg, msg.innerText);
+			console.log(msg, msg.innerText);
 		} else {
 			msg.innerText = message;
 		}
@@ -65,7 +65,7 @@
 			}
 		} catch (err: unknown) {
 			const msg = err instanceof Error ? err.message : String(err);
-			log(msg);
+			console.log(msg);
 		}
 	}
 
@@ -81,7 +81,7 @@
 			}
 		} catch (err: unknown) {
 			const msg = err instanceof Error ? err.message : String(err);
-			log(msg);
+			console.log(msg);
 		}
 	}
 	let selectedButtons = new SvelteSet<string>(['Pumpernickel', 'Melitta']);

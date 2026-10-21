@@ -320,7 +320,7 @@ Package Manager e.g. pnpm.
   div class="log-group.success">
       div class=".status-indicator">/div>
   /div>
-  log-group.success -- one element with multiple classes
+  console.log-group.success -- one element with multiple classes
   div class="log-group success">/div>
   in our case class="log-group {group.status}" where group.status==='success'
 */

@@ -2,21 +2,13 @@
 	// Pure helper function to split camelCase/PascalCase and capitalize tokens
 	// e.g., "phoneNumber" -> "Phone Number"
 	// It tries to convert any char, event non-letter, preceding with witespace
-	export function capitalizeText(str: string): string {
-		return (
-			str
-				// Insert space before capital letters and lowercase letters following digits
-				.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-				// Capitalize the first letter of every word
-				.replace(/\b\w/g, (char) => char.toUpperCase())
-		);
-	}
 </script>
 
 <script lang="ts">
 	import { tick } from 'svelte';
 	import formatPhoneNumber from '$lib/utils/phone-number';
 	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { capitalizeText } from '$lib/utils';
 	import { validateHeaderName } from 'http';
 
 	interface PROPS extends Partial<HTMLInputAttributes> {

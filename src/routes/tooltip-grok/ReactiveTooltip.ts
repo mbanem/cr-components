@@ -144,22 +144,22 @@ export class ReactiveTooltip {
   // existing tooltip gets different options properties, so it saves
   // the previous options and generate tooltip witj new ones
   public reshape(options: Partial<TTooltipOptions>, existing?: boolean) {
-    log(options)
+    console.log(options)
     this.shapes.push(options)
     let result: any
     for (const key of this.typedKeys(options)) {
       const val = options[key]; // Fully typed! 'key' is keyof ITooltipOptions
       switch (key) {
         case 'anchor':
-          log('case anchor', val)
+          console.log('case anchor', val)
           this.anchor = val as THovered
-          log('now this._anchor', this._anchor)
+          console.log('now this._anchor', this._anchor)
           if (result = isTPosition(this._anchor)) {
             this.anchorRect = new DOMRect(result.x, result.y, 0, 0)
           } else {
             this.anchorRect = (this._anchor as HTMLElement).getBoundingClientRect()
           }
-          log('this.anchorRect', this.anchorRect)
+          console.log('this.anchorRect', this.anchorRect)
           break
         case 'content':
           this._content = val as HTMLElement | string
@@ -193,7 +193,7 @@ export class ReactiveTooltip {
     } else {
       this.destroy(partly)
     }
-    log('returned from reshape')
+    console.log('returned from reshape')
     return this as ReactiveTooltip
   }
 
@@ -572,7 +572,7 @@ const tooltipOptions = {
 
 const tooltipEl = ReactiveTooltip.createTooltip(tooltipOptions)
 `
-    log(tooltipOptions)
+    console.log(tooltipOptions)
     await navigator.clipboard.writeText(tooltipOptions);
   }
 }

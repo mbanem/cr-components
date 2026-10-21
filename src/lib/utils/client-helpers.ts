@@ -1,6 +1,50 @@
-import { type TPosition } from '$lib/types/tooltip-args'
+// import { type TPosition } from '$lib/types/tooltip-args'
 
-export function formatPhoneNumber(rawValue: string): string {
+export const phoneFormat = 'in format xxx-xxx-xxxx, ext. xx';
+export const VALID_EVENTS = [
+  'Enter',
+  'input',
+  'change',
+  'keyup',
+  'keypress',
+  'keydown',
+  'blur',
+  'focus',
+  'paste',
+  'mouseenter',
+  'mouseleave'
+] as const;
+export function capitalizeText(str: string): string {
+  return (
+    str
+      // Insert space before capital letters and lowercase letters following digits
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      // Capitalize the first letter of every word
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+  );
+}
+export type TS = {
+  isFocused: boolean;
+  isDirty: boolean;
+  placeholder: string;
+  reformat: string;
+};
+const phoneRegex = /^(\+\d{1,4})?\s*(\d{3}-\d{3}-\d{4})(,\s*ext\.\s*\d{1,5})?$/;
+export function isPhoneFormatOK(str: string, s: TS) {
+  if (phoneRegex.test(str)) {
+    s.reformat = ''
+    return true
+  }
+  return false
+}
+export function formatPhoneNumber(rawValue: string, s: TS): string {
+  let dialCode = ''
+  const m = rawValue.trim().match(/[^-\s ]+/g);
+  if (m && m[0].startsWith('+')) {
+    dialCode = m.splice(0, 1)[0].trim();
+    rawValue = m.join('')
+  }
+
   const digits = rawValue.replace(/\D/g, '');
   const mainDigits = digits.slice(0, 10);
   const extDigits = digits.slice(10, 15);
@@ -19,7 +63,10 @@ export function formatPhoneNumber(rawValue: string): string {
     formatted += `, ext. ${extDigits}`;
   }
 
-  return formatted;
+  s.reformat = ''
+  // has a trailing space if added ', ext. '
+  return dialCode ? dialCode + ' ' + formatted : formatted
+  // return formatted
 }
 export function capitalize(str: string): string {
   return (
@@ -31,18 +78,18 @@ export function capitalize(str: string): string {
   );
 }
 
-export const setTextColor = (varName: string, color: string) => {
-  try {
-    if (document) {
-      const root = document.querySelector(':root') as HTMLElement;
-      if (root) {
-        root.style.setProperty(varName, color);
-      }
-    }
-  } catch (err) {
-    console.log('setTextColor', err);
-  }
-};
+// export const setTextColor = (varName: string, color: string) => {
+//   try {
+//     if (document) {
+//       const root = document.querySelector(':root') as HTMLElement;
+//       if (root) {
+//         root.style.setProperty(varName, color);
+//       }
+//     }
+//   } catch (err) {
+//     console.log('setTextColor', err);
+//   }
+// };
 
 export const setCssVarColor = (varName: string, color: string) => {
   if (document) {

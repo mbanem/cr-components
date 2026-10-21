@@ -243,7 +243,7 @@
 		position: relative;
 		width: max-content;
 		/* adjust label to look like placeholder */
-		padding-top: 0.8rem;
+		padding: 0.8rem;
 		label {
 			position: absolute;
 			left: 5px;

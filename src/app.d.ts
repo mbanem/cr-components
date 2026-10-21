@@ -17,6 +17,7 @@ declare global {
 
 	const log: typeof console.log;
 
+	export type TCountryCodeBox = 'small' | 'expanded' | 'none'
 	export type TEnum = Record<string, string>;
 	export type TEnums = Record<string, TEnum>;
 	export type Field = {
@@ -48,7 +49,7 @@ declare global {
 	export type TComponentType = 'RadioGroup' | 'CheckboxGroup'
 
 	// Ensure your base list includes all allowed events (including your examples like mouseenter/mouseleave)
-	export const VALID_EVENTS = [
+	const VALID_EVENTS = [
 		'Enter',
 		'input',
 		'change',
