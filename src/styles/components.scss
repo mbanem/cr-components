@@ -6,6 +6,12 @@
   width: 20rem;
 }
 
+/* PhoneNumber input box class cr-input while country codes input box
+  class country-codes masks it so its z-index:-2 allow 
+  PhoneNumber input box to be accessed initially, but when
+  class:allow-codes= {isCountryCodeSearchOn} when active
+  it hides cr-input and ativate country-codes
+*/
 .cr-input-container {
   display: inline-block;
   width: clamp(16rem, 18rem, 30rem);
@@ -15,7 +21,10 @@
 
 .cr-input-container .input-wrapper {
   position: relative;
-  margin-top: 0rem;
+  /* lover position below temporary line of information
+    mdl false val show true srch false TODO remove tha line
+  */
+  margin-top: 0.2rem;
   width: 100%;
 }
 
@@ -57,9 +66,24 @@
   color: $cr-disabled-color;
 }
 
-.cr-input-container .cr-input,
+/* bot input boxes got style from mixin cr-input-base */
+.cr-input,
 .country-codes {
+  position: absolute;
+  top: 0;
+  left: 0;
   @include cr-input-base;
+  z-index: -2;
+}
+
+.cr-input.allow-codes {
+  opacity: 0 !important;
+  z-index: -2 !important;
+}
+
+.country-codes.allow-codes {
+  opacity: 1 !important;
+  z-index: 12 !important;
 }
 
 .cr-input-container .cr-input:focus {
@@ -70,19 +94,28 @@
   @include cr-input-placeholder;
 }
 
-/* positioning label playground */
+/* floating-label class manages label as
+  a placeholder moving it up as a label
+  on PhoneNumber input element focus event
+  it is used as a message info where message
+  is appended on its regular coontent with
+  text-overflow: ellipses
+  initially position as a placeholder and
+  translate -1rem up as an input box label
+*/
 .cr-input-container .floating-label {
   position: absolute;
   left: 0.75rem;
-  top: 20%;
-  transform: translateY(-50%);
+  top: 50%;
+  // transform: translateY(-1rem);
   /* Centered inside input like a true placeholder */
-  background: transparent;
-  /* Transparent when inside input */
-  padding: 0 0.25rem;
+  background: white;
+  /* cut by country-codes input box class */
+  padding: 4px 0.25rem;
   color: $cr-label-color;
   opacity: 0.6;
   pointer-events: none;
+  // z-index: 15;
 
   transition:
     transform 0.2s ease,
@@ -97,15 +130,18 @@
   z-index: 4;
 }
 
+/* turn gray colored label from placeholder kind into 
+  a blue colored label above PhoneNumber input box
+*/
 .cr-input-container .floating-label.floating {
-  top: -1rem;
+  top: -1.2rem;
   transform: translateY(8%);
   /* Keeps it vertically centered on the top border */
   background: $cr-label-background;
   /* Covers the border line behind the text */
   font-size: 0.85rem;
   opacity: 1;
-  color: blue;
+  z-index: 12;
 }
 
 .cr-input-container .floating-label {

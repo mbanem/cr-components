@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { handleTryCatch } from '$lib/utils/helpers';
+	globalThis.handleTryCatch = handleTryCatch;
 	import favicon from '$lib/assets/favicon.svg';
 	let { children } = $props();
 	import '$styles/components.scss';
-	(globalThis as typeof globalThis & { log: typeof console.log }).log = console.log;
 </script>
 
 <svelte:head>

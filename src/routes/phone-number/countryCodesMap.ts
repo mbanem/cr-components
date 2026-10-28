@@ -1,980 +1,1010 @@
 import { SvelteMap } from 'svelte/reactivity'
 export type TCountryName = string
 export type TCountryCodes = { dialCode: string, code: string }
-const codes = {
+const codes: Record<TCountryName, TCountryCodes> = {
   Afghanistan: {
-    dial_code: '+93',
+    dialCode: '+93',
     code: 'AF'
   },
   'Aland Islands': {
-    dial_code: '+358',
+    dialCode: '+358',
     code: 'AX'
   },
   Albania: {
-    dial_code: '+355',
+    dialCode: '+355',
     code: 'AL'
   },
   Algeria: {
-    dial_code: '+213',
+    dialCode: '+213',
     code: 'DZ'
   },
   AmericanSamoa: {
-    dial_code: '+1684',
+    dialCode: '+1684',
     code: 'AS'
   },
   Andorra: {
-    dial_code: '+376',
+    dialCode: '+376',
     code: 'AD'
   },
   Angola: {
-    dial_code: '+244',
+    dialCode: '+244',
     code: 'AO'
   },
   Anguilla: {
-    dial_code: '+1264',
+    dialCode: '+1264',
     code: 'AI'
   },
   Antarctica: {
-    dial_code: '+672',
+    dialCode: '+672',
     code: 'AQ'
   },
   'Antigua and Barbuda': {
-    dial_code: '+1268',
+    dialCode: '+1268',
     code: 'AG'
   },
   Argentina: {
-    dial_code: '+54',
+    dialCode: '+54',
     code: 'AR'
   },
   Armenia: {
-    dial_code: '+374',
+    dialCode: '+374',
     code: 'AM'
   },
   Aruba: {
-    dial_code: '+297',
+    dialCode: '+297',
     code: 'AW'
   },
   Australia: {
-    dial_code: '+61',
+    dialCode: '+61',
     code: 'AU'
   },
   Austria: {
-    dial_code: '+43',
+    dialCode: '+43',
     code: 'AT'
   },
   Azerbaijan: {
-    dial_code: '+994',
+    dialCode: '+994',
     code: 'AZ'
   },
   Bahamas: {
-    dial_code: '+1242',
+    dialCode: '+1242',
     code: 'BS'
   },
   Bahrain: {
-    dial_code: '+973',
+    dialCode: '+973',
     code: 'BH'
   },
   Bangladesh: {
-    dial_code: '+880',
+    dialCode: '+880',
     code: 'BD'
   },
   Barbados: {
-    dial_code: '+1246',
+    dialCode: '+1246',
     code: 'BB'
   },
   Belarus: {
-    dial_code: '+375',
+    dialCode: '+375',
     code: 'BY'
   },
   Belgium: {
-    dial_code: '+32',
+    dialCode: '+32',
     code: 'BE'
   },
   Belize: {
-    dial_code: '+501',
+    dialCode: '+501',
     code: 'BZ'
   },
   Benin: {
-    dial_code: '+229',
+    dialCode: '+229',
     code: 'BJ'
   },
   Bermuda: {
-    dial_code: '+1441',
+    dialCode: '+1441',
     code: 'BM'
   },
   Bhutan: {
-    dial_code: '+975',
+    dialCode: '+975',
     code: 'BT'
   },
   'Bolivia, Plurinational State of': {
-    dial_code: '+591',
+    dialCode: '+591',
     code: 'BO'
   },
   'Bosnia and Herzegovina': {
-    dial_code: '+387',
+    dialCode: '+387',
     code: 'BA'
   },
   Botswana: {
-    dial_code: '+267',
+    dialCode: '+267',
     code: 'BW'
   },
   Brazil: {
-    dial_code: '+55',
+    dialCode: '+55',
     code: 'BR'
   },
   'British Indian Ocean Territory': {
-    dial_code: '+246',
+    dialCode: '+246',
     code: 'IO'
   },
   'Brunei Darussalam': {
-    dial_code: '+673',
+    dialCode: '+673',
     code: 'BN'
   },
   Bulgaria: {
-    dial_code: '+359',
+    dialCode: '+359',
     code: 'BG'
   },
   'Burkina Faso': {
-    dial_code: '+226',
+    dialCode: '+226',
     code: 'BF'
   },
   Burundi: {
-    dial_code: '+257',
+    dialCode: '+257',
     code: 'BI'
   },
   Cambodia: {
-    dial_code: '+855',
+    dialCode: '+855',
     code: 'KH'
   },
   Cameroon: {
-    dial_code: '+237',
+    dialCode: '+237',
     code: 'CM'
   },
   Canada: {
-    dial_code: '+1',
+    dialCode: '+1',
     code: 'CA'
   },
   'Cape Verde': {
-    dial_code: '+238',
+    dialCode: '+238',
     code: 'CV'
   },
   'Cayman Islands': {
-    dial_code: '+ 345',
+    dialCode: '+ 345',
     code: 'KY'
   },
   'Central African Republic': {
-    dial_code: '+236',
+    dialCode: '+236',
     code: 'CF'
   },
   Chad: {
-    dial_code: '+235',
+    dialCode: '+235',
     code: 'TD'
   },
   Chile: {
-    dial_code: '+56',
+    dialCode: '+56',
     code: 'CL'
   },
   China: {
-    dial_code: '+86',
+    dialCode: '+86',
     code: 'CN'
   },
   'Christmas Island': {
-    dial_code: '+61',
+    dialCode: '+61',
     code: 'CX'
   },
   'Cocos (Keeling) Islands': {
-    dial_code: '+61',
+    dialCode: '+61',
     code: 'CC'
   },
   Colombia: {
-    dial_code: '+57',
+    dialCode: '+57',
     code: 'CO'
   },
   Comoros: {
-    dial_code: '+269',
+    dialCode: '+269',
     code: 'KM'
   },
   Congo: {
-    dial_code: '+242',
+    dialCode: '+242',
     code: 'CG'
   },
   'Congo, The Democratic Republic of the Congo': {
-    dial_code: '+243',
+    dialCode: '+243',
     code: 'CD'
   },
   'Cook Islands': {
-    dial_code: '+682',
+    dialCode: '+682',
     code: 'CK'
   },
   'Costa Rica': {
-    dial_code: '+506',
+    dialCode: '+506',
     code: 'CR'
   },
   "Cote d'Ivoire": {
-    dial_code: '+225',
+    dialCode: '+225',
     code: 'CI'
   },
   Croatia: {
-    dial_code: '+385',
+    dialCode: '+385',
     code: 'HR'
   },
   Cuba: {
-    dial_code: '+53',
+    dialCode: '+53',
     code: 'CU'
   },
   Cyprus: {
-    dial_code: '+357',
+    dialCode: '+357',
     code: 'CY'
   },
   'Czech Republic': {
-    dial_code: '+420',
+    dialCode: '+420',
     code: 'CZ'
   },
   Denmark: {
-    dial_code: '+45',
+    dialCode: '+45',
     code: 'DK'
   },
   Djibouti: {
-    dial_code: '+253',
+    dialCode: '+253',
     code: 'DJ'
   },
   Dominica: {
-    dial_code: '+1767',
+    dialCode: '+1767',
     code: 'DM'
   },
   'Dominican Republic': {
-    dial_code: '+1849',
+    dialCode: '+1849',
     code: 'DO'
   },
   Ecuador: {
-    dial_code: '+593',
+    dialCode: '+593',
     code: 'EC'
   },
   Egypt: {
-    dial_code: '+20',
+    dialCode: '+20',
     code: 'EG'
   },
   'El Salvador': {
-    dial_code: '+503',
+    dialCode: '+503',
     code: 'SV'
   },
   'Equatorial Guinea': {
-    dial_code: '+240',
+    dialCode: '+240',
     code: 'GQ'
   },
   Eritrea: {
-    dial_code: '+291',
+    dialCode: '+291',
     code: 'ER'
   },
   Estonia: {
-    dial_code: '+372',
+    dialCode: '+372',
     code: 'EE'
   },
   Ethiopia: {
-    dial_code: '+251',
+    dialCode: '+251',
     code: 'ET'
   },
   'Falkland Islands (Malvinas)': {
-    dial_code: '+500',
+    dialCode: '+500',
     code: 'FK'
   },
   'Faroe Islands': {
-    dial_code: '+298',
+    dialCode: '+298',
     code: 'FO'
   },
   Fiji: {
-    dial_code: '+679',
+    dialCode: '+679',
     code: 'FJ'
   },
   Finland: {
-    dial_code: '+358',
+    dialCode: '+358',
     code: 'FI'
   },
   France: {
-    dial_code: '+33',
+    dialCode: '+33',
     code: 'FR'
   },
   'French Guiana': {
-    dial_code: '+594',
+    dialCode: '+594',
     code: 'GF'
   },
   'French Polynesia': {
-    dial_code: '+689',
+    dialCode: '+689',
     code: 'PF'
   },
   Gabon: {
-    dial_code: '+241',
+    dialCode: '+241',
     code: 'GA'
   },
   Gambia: {
-    dial_code: '+220',
+    dialCode: '+220',
     code: 'GM'
   },
   Georgia: {
-    dial_code: '+995',
+    dialCode: '+995',
     code: 'GE'
   },
   Germany: {
-    dial_code: '+49',
+    dialCode: '+49',
     code: 'DE'
   },
   Ghana: {
-    dial_code: '+233',
+    dialCode: '+233',
     code: 'GH'
   },
   Gibraltar: {
-    dial_code: '+350',
+    dialCode: '+350',
     code: 'GI'
   },
   Greece: {
-    dial_code: '+30',
+    dialCode: '+30',
     code: 'GR'
   },
   Greenland: {
-    dial_code: '+299',
+    dialCode: '+299',
     code: 'GL'
   },
   Grenada: {
-    dial_code: '+1473',
+    dialCode: '+1473',
     code: 'GD'
   },
   Guadeloupe: {
-    dial_code: '+590',
+    dialCode: '+590',
     code: 'GP'
   },
   Guam: {
-    dial_code: '+1671',
+    dialCode: '+1671',
     code: 'GU'
   },
   Guatemala: {
-    dial_code: '+502',
+    dialCode: '+502',
     code: 'GT'
   },
   Guernsey: {
-    dial_code: '+44',
+    dialCode: '+44',
     code: 'GG'
   },
   Guinea: {
-    dial_code: '+224',
+    dialCode: '+224',
     code: 'GN'
   },
   'Guinea-Bissau': {
-    dial_code: '+245',
+    dialCode: '+245',
     code: 'GW'
   },
   Guyana: {
-    dial_code: '+595',
+    dialCode: '+595',
     code: 'GY'
   },
   Haiti: {
-    dial_code: '+509',
+    dialCode: '+509',
     code: 'HT'
   },
   'Holy See (Vatican City State)': {
-    dial_code: '+379',
+    dialCode: '+379',
     code: 'VA'
   },
   Honduras: {
-    dial_code: '+504',
+    dialCode: '+504',
     code: 'HN'
   },
   'Hong Kong': {
-    dial_code: '+852',
+    dialCode: '+852',
     code: 'HK'
   },
   Hungary: {
-    dial_code: '+36',
+    dialCode: '+36',
     code: 'HU'
   },
   Iceland: {
-    dial_code: '+354',
+    dialCode: '+354',
     code: 'IS'
   },
   India: {
-    dial_code: '+91',
+    dialCode: '+91',
     code: 'IN'
   },
   Indonesia: {
-    dial_code: '+62',
+    dialCode: '+62',
     code: 'ID'
   },
   'Iran, Islamic Republic of Persian Gulf': {
-    dial_code: '+98',
+    dialCode: '+98',
     code: 'IR'
   },
   Iraq: {
-    dial_code: '+964',
+    dialCode: '+964',
     code: 'IQ'
   },
   Ireland: {
-    dial_code: '+353',
+    dialCode: '+353',
     code: 'IE'
   },
   'Isle of Man': {
-    dial_code: '+44',
+    dialCode: '+44',
     code: 'IM'
   },
   Israel: {
-    dial_code: '+972',
+    dialCode: '+972',
     code: 'IL'
   },
   Italy: {
-    dial_code: '+39',
+    dialCode: '+39',
     code: 'IT'
   },
   Jamaica: {
-    dial_code: '+1876',
+    dialCode: '+1876',
     code: 'JM'
   },
   Japan: {
-    dial_code: '+81',
+    dialCode: '+81',
     code: 'JP'
   },
   Jersey: {
-    dial_code: '+44',
+    dialCode: '+44',
     code: 'JE'
   },
   Jordan: {
-    dial_code: '+962',
+    dialCode: '+962',
     code: 'JO'
   },
   Kazakhstan: {
-    dial_code: '+77',
+    dialCode: '+77',
     code: 'KZ'
   },
   Kenya: {
-    dial_code: '+254',
+    dialCode: '+254',
     code: 'KE'
   },
   Kiribati: {
-    dial_code: '+686',
+    dialCode: '+686',
     code: 'KI'
   },
   "Korea, Democratic People's Republic of Korea": {
-    dial_code: '+850',
+    dialCode: '+850',
     code: 'KP'
   },
   'Korea, Republic of South Korea': {
-    dial_code: '+82',
+    dialCode: '+82',
     code: 'KR'
   },
   Kuwait: {
-    dial_code: '+965',
+    dialCode: '+965',
     code: 'KW'
   },
   Kyrgyzstan: {
-    dial_code: '+996',
+    dialCode: '+996',
     code: 'KG'
   },
   Laos: {
-    dial_code: '+856',
+    dialCode: '+856',
     code: 'LA'
   },
   Latvia: {
-    dial_code: '+371',
+    dialCode: '+371',
     code: 'LV'
   },
   Lebanon: {
-    dial_code: '+961',
+    dialCode: '+961',
     code: 'LB'
   },
   Lesotho: {
-    dial_code: '+266',
+    dialCode: '+266',
     code: 'LS'
   },
   Liberia: {
-    dial_code: '+231',
+    dialCode: '+231',
     code: 'LR'
   },
   'Libyan Arab Jamahiriya': {
-    dial_code: '+218',
+    dialCode: '+218',
     code: 'LY'
   },
   Liechtenstein: {
-    dial_code: '+423',
+    dialCode: '+423',
     code: 'LI'
   },
   Lithuania: {
-    dial_code: '+370',
+    dialCode: '+370',
     code: 'LT'
   },
   Luxembourg: {
-    dial_code: '+352',
+    dialCode: '+352',
     code: 'LU'
   },
   Macao: {
-    dial_code: '+853',
+    dialCode: '+853',
     code: 'MO'
   },
   Macedonia: {
-    dial_code: '+389',
+    dialCode: '+389',
     code: 'MK'
   },
   Madagascar: {
-    dial_code: '+261',
+    dialCode: '+261',
     code: 'MG'
   },
   Malawi: {
-    dial_code: '+265',
+    dialCode: '+265',
     code: 'MW'
   },
   Malaysia: {
-    dial_code: '+60',
+    dialCode: '+60',
     code: 'MY'
   },
   Maldives: {
-    dial_code: '+960',
+    dialCode: '+960',
     code: 'MV'
   },
   Mali: {
-    dial_code: '+223',
+    dialCode: '+223',
     code: 'ML'
   },
   Malta: {
-    dial_code: '+356',
+    dialCode: '+356',
     code: 'MT'
   },
   'Marshall Islands': {
-    dial_code: '+692',
+    dialCode: '+692',
     code: 'MH'
   },
   Martinique: {
-    dial_code: '+596',
+    dialCode: '+596',
     code: 'MQ'
   },
   Mauritania: {
-    dial_code: '+222',
+    dialCode: '+222',
     code: 'MR'
   },
   Mauritius: {
-    dial_code: '+230',
+    dialCode: '+230',
     code: 'MU'
   },
   Mayotte: {
-    dial_code: '+262',
+    dialCode: '+262',
     code: 'YT'
   },
   Mexico: {
-    dial_code: '+52',
+    dialCode: '+52',
     code: 'MX'
   },
   'Micronesia, Federated States of Micronesia': {
-    dial_code: '+691',
+    dialCode: '+691',
     code: 'FM'
   },
   Moldova: {
-    dial_code: '+373',
+    dialCode: '+373',
     code: 'MD'
   },
   Monaco: {
-    dial_code: '+377',
+    dialCode: '+377',
     code: 'MC'
   },
   Mongolia: {
-    dial_code: '+976',
+    dialCode: '+976',
     code: 'MN'
   },
   Montenegro: {
-    dial_code: '+382',
+    dialCode: '+382',
     code: 'ME'
   },
   Montserrat: {
-    dial_code: '+1664',
+    dialCode: '+1664',
     code: 'MS'
   },
   Morocco: {
-    dial_code: '+212',
+    dialCode: '+212',
     code: 'MA'
   },
   Mozambique: {
-    dial_code: '+258',
+    dialCode: '+258',
     code: 'MZ'
   },
   Myanmar: {
-    dial_code: '+95',
+    dialCode: '+95',
     code: 'MM'
   },
   Namibia: {
-    dial_code: '+264',
+    dialCode: '+264',
     code: 'NA'
   },
   Nauru: {
-    dial_code: '+674',
+    dialCode: '+674',
     code: 'NR'
   },
   Nepal: {
-    dial_code: '+977',
+    dialCode: '+977',
     code: 'NP'
   },
   Netherlands: {
-    dial_code: '+31',
+    dialCode: '+31',
     code: 'NL'
   },
   'Netherlands Antilles': {
-    dial_code: '+599',
+    dialCode: '+599',
     code: 'AN'
   },
   'New Caledonia': {
-    dial_code: '+687',
+    dialCode: '+687',
     code: 'NC'
   },
   'New Zealand': {
-    dial_code: '+64',
+    dialCode: '+64',
     code: 'NZ'
   },
   Nicaragua: {
-    dial_code: '+505',
+    dialCode: '+505',
     code: 'NI'
   },
   Niger: {
-    dial_code: '+227',
+    dialCode: '+227',
     code: 'NE'
   },
   Nigeria: {
-    dial_code: '+234',
+    dialCode: '+234',
     code: 'NG'
   },
   Niue: {
-    dial_code: '+683',
+    dialCode: '+683',
     code: 'NU'
   },
   'Norfolk Island': {
-    dial_code: '+672',
+    dialCode: '+672',
     code: 'NF'
   },
   'Northern Mariana Islands': {
-    dial_code: '+1670',
+    dialCode: '+1670',
     code: 'MP'
   },
   Norway: {
-    dial_code: '+47',
+    dialCode: '+47',
     code: 'NO'
   },
   Oman: {
-    dial_code: '+968',
+    dialCode: '+968',
     code: 'OM'
   },
   Pakistan: {
-    dial_code: '+92',
+    dialCode: '+92',
     code: 'PK'
   },
   Palau: {
-    dial_code: '+680',
+    dialCode: '+680',
     code: 'PW'
   },
   'Palestinian Territory, Occupied': {
-    dial_code: '+970',
+    dialCode: '+970',
     code: 'PS'
   },
   Panama: {
-    dial_code: '+507',
+    dialCode: '+507',
     code: 'PA'
   },
   'Papua New Guinea': {
-    dial_code: '+675',
+    dialCode: '+675',
     code: 'PG'
   },
   Paraguay: {
-    dial_code: '+595',
+    dialCode: '+595',
     code: 'PY'
   },
   Peru: {
-    dial_code: '+51',
+    dialCode: '+51',
     code: 'PE'
   },
   Philippines: {
-    dial_code: '+63',
+    dialCode: '+63',
     code: 'PH'
   },
   Pitcairn: {
-    dial_code: '+872',
+    dialCode: '+872',
     code: 'PN'
   },
   Poland: {
-    dial_code: '+48',
+    dialCode: '+48',
     code: 'PL'
   },
   Portugal: {
-    dial_code: '+351',
+    dialCode: '+351',
     code: 'PT'
   },
   'Puerto Rico': {
-    dial_code: '+1939',
+    dialCode: '+1939',
     code: 'PR'
   },
   Qatar: {
-    dial_code: '+974',
+    dialCode: '+974',
     code: 'QA'
   },
   Romania: {
-    dial_code: '+40',
+    dialCode: '+40',
     code: 'RO'
   },
   Russia: {
-    dial_code: '+7',
+    dialCode: '+7',
     code: 'RU'
   },
   Rwanda: {
-    dial_code: '+250',
+    dialCode: '+250',
     code: 'RW'
   },
   Reunion: {
-    dial_code: '+262',
+    dialCode: '+262',
     code: 'RE'
   },
   'Saint Barthelemy': {
-    dial_code: '+590',
+    dialCode: '+590',
     code: 'BL'
   },
   'Saint Helena, Ascension and Tristan Da Cunha': {
-    dial_code: '+290',
+    dialCode: '+290',
     code: 'SH'
   },
   'Saint Kitts and Nevis': {
-    dial_code: '+1869',
+    dialCode: '+1869',
     code: 'KN'
   },
   'Saint Lucia': {
-    dial_code: '+1758',
+    dialCode: '+1758',
     code: 'LC'
   },
   'Saint Martin': {
-    dial_code: '+590',
+    dialCode: '+590',
     code: 'MF'
   },
   'Saint Pierre and Miquelon': {
-    dial_code: '+508',
+    dialCode: '+508',
     code: 'PM'
   },
   'Saint Vincent and the Grenadines': {
-    dial_code: '+1784',
+    dialCode: '+1784',
     code: 'VC'
   },
   Samoa: {
-    dial_code: '+685',
+    dialCode: '+685',
     code: 'WS'
   },
   'San Marino': {
-    dial_code: '+378',
+    dialCode: '+378',
     code: 'SM'
   },
   'Sao Tome and Principe': {
-    dial_code: '+239',
+    dialCode: '+239',
     code: 'ST'
   },
   'Saudi Arabia': {
-    dial_code: '+966',
+    dialCode: '+966',
     code: 'SA'
   },
   Senegal: {
-    dial_code: '+221',
+    dialCode: '+221',
     code: 'SN'
   },
   Serbia: {
-    dial_code: '+381',
+    dialCode: '+381',
     code: 'RS'
   },
   Seychelles: {
-    dial_code: '+248',
+    dialCode: '+248',
     code: 'SC'
   },
   'Sierra Leone': {
-    dial_code: '+232',
+    dialCode: '+232',
     code: 'SL'
   },
   Singapore: {
-    dial_code: '+65',
+    dialCode: '+65',
     code: 'SG'
   },
   Slovakia: {
-    dial_code: '+421',
+    dialCode: '+421',
     code: 'SK'
   },
   Slovenia: {
-    dial_code: '+386',
+    dialCode: '+386',
     code: 'SI'
   },
   'Solomon Islands': {
-    dial_code: '+677',
+    dialCode: '+677',
     code: 'SB'
   },
   Somalia: {
-    dial_code: '+252',
+    dialCode: '+252',
     code: 'SO'
   },
   'South Africa': {
-    dial_code: '+27',
+    dialCode: '+27',
     code: 'ZA'
   },
   'South Sudan': {
-    dial_code: '+211',
+    dialCode: '+211',
     code: 'SS'
   },
   'South Georgia and the South Sandwich Islands': {
-    dial_code: '+500',
+    dialCode: '+500',
     code: 'GS'
   },
   Spain: {
-    dial_code: '+34',
+    dialCode: '+34',
     code: 'ES'
   },
   'Sri Lanka': {
-    dial_code: '+94',
+    dialCode: '+94',
     code: 'LK'
   },
   Sudan: {
-    dial_code: '+249',
+    dialCode: '+249',
     code: 'SD'
   },
   Suriname: {
-    dial_code: '+597',
+    dialCode: '+597',
     code: 'SR'
   },
   'Svalbard and Jan Mayen': {
-    dial_code: '+47',
+    dialCode: '+47',
     code: 'SJ'
   },
   Swaziland: {
-    dial_code: '+268',
+    dialCode: '+268',
     code: 'SZ'
   },
   Sweden: {
-    dial_code: '+46',
+    dialCode: '+46',
     code: 'SE'
   },
   Switzerland: {
-    dial_code: '+41',
+    dialCode: '+41',
     code: 'CH'
   },
   'Syrian Arab Republic': {
-    dial_code: '+963',
+    dialCode: '+963',
     code: 'SY'
   },
   Taiwan: {
-    dial_code: '+886',
+    dialCode: '+886',
     code: 'TW'
   },
   Tajikistan: {
-    dial_code: '+992',
+    dialCode: '+992',
     code: 'TJ'
   },
   'Tanzania, United Republic of Tanzania': {
-    dial_code: '+255',
+    dialCode: '+255',
     code: 'TZ'
   },
   Thailand: {
-    dial_code: '+66',
+    dialCode: '+66',
     code: 'TH'
   },
   'Timor-Leste': {
-    dial_code: '+670',
+    dialCode: '+670',
     code: 'TL'
   },
   Togo: {
-    dial_code: '+228',
+    dialCode: '+228',
     code: 'TG'
   },
   Tokelau: {
-    dial_code: '+690',
+    dialCode: '+690',
     code: 'TK'
   },
   Tonga: {
-    dial_code: '+676',
+    dialCode: '+676',
     code: 'TO'
   },
   'Trinidad and Tobago': {
-    dial_code: '+1868',
+    dialCode: '+1868',
     code: 'TT'
   },
   Tunisia: {
-    dial_code: '+216',
+    dialCode: '+216',
     code: 'TN'
   },
   Turkey: {
-    dial_code: '+90',
+    dialCode: '+90',
     code: 'TR'
   },
   Turkmenistan: {
-    dial_code: '+993',
+    dialCode: '+993',
     code: 'TM'
   },
   'Turks and Caicos Islands': {
-    dial_code: '+1649',
+    dialCode: '+1649',
     code: 'TC'
   },
   Tuvalu: {
-    dial_code: '+688',
+    dialCode: '+688',
     code: 'TV'
   },
   Uganda: {
-    dial_code: '+256',
+    dialCode: '+256',
     code: 'UG'
   },
   Ukraine: {
-    dial_code: '+380',
+    dialCode: '+380',
     code: 'UA'
   },
   'United Arab Emirates': {
-    dial_code: '+971',
+    dialCode: '+971',
     code: 'AE'
   },
   'United Kingdom': {
-    dial_code: '+44',
+    dialCode: '+44',
     code: 'GB'
   },
   'United States': {
-    dial_code: '+1',
+    dialCode: '+1',
     code: 'US'
   },
   Uruguay: {
-    dial_code: '+598',
+    dialCode: '+598',
     code: 'UY'
   },
   Uzbekistan: {
-    dial_code: '+998',
+    dialCode: '+998',
     code: 'UZ'
   },
   Vanuatu: {
-    dial_code: '+678',
+    dialCode: '+678',
     code: 'VU'
   },
   'Venezuela, Bolivarian Republic of Venezuela': {
-    dial_code: '+58',
+    dialCode: '+58',
     code: 'VE'
   },
   Vietnam: {
-    dial_code: '+84',
+    dialCode: '+84',
     code: 'VN'
   },
   'Virgin Islands, British': {
-    dial_code: '+1284',
+    dialCode: '+1284',
     code: 'VG'
   },
   'Virgin Islands, U.S.': {
-    dial_code: '+1340',
+    dialCode: '+1340',
     code: 'VI'
   },
   'Wallis and Futuna': {
-    dial_code: '+681',
+    dialCode: '+681',
     code: 'WF'
   },
   Yemen: {
-    dial_code: '+967',
+    dialCode: '+967',
     code: 'YE'
   },
   Zambia: {
-    dial_code: '+260',
+    dialCode: '+260',
     code: 'ZM'
   },
   Zimbabwe: {
-    dial_code: '+263',
+    dialCode: '+263',
     code: 'ZW'
   }
 };
+let countryCodesMap: SvelteMap<TCountryName, TCountryCodes>;
+
 export function getCountryCodesMap() {
-  const countryCodesMap = new SvelteMap<TCountryName, TCountryCodes>()
-  for (const [k, { dial_code: dialCode, code }] of Object.entries(codes)) {
+  if (!countryCodesMap) {
+    countryCodesMap = new SvelteMap<TCountryName, TCountryCodes>()
+  }
+  for (const [k, { dialCode, code }] of Object.entries(codes)) {
     countryCodesMap.set(k, { dialCode, code });
   }
+  console.log('getCountryCodesMap returns')
   return countryCodesMap
 }
+
+// export function getFrequences(leadingChars: number) {
+//   if (!leadingChars || leadingChars < 2 || leadingChars > 4) {
+//     console.error('getFrequences accept leadingChars argument in range 2-4')
+//     return undefined
+//   }
+//   const tempFreq = new Map<string, number>();
+//   console.log('getFrequences')
+//   for (const countryName of Object.keys(codes)) {
+//     console.log('countryName', countryName)
+//     // Get the first letters and normalize them (e.g., to lowercase)
+//     const nLetters = countryName.substring(0, leadingChars).toLowerCase();
+
+//     tempFreq.set(nLetters, (tempFreq.get(nLetters) || 0) + 1);
+//   }
+//   const entries = Array.from(tempFreq.entries().filter((el) => el[1] > 1));
+
+//   // 2. Sort the array by value (frequency) in descending order
+//   entries.sort((a, b) => b[1] - a[1]);
+
+//   // 2. Convert to SvelteMap
+//   // SvelteMap constructor accepts an iterable of [key, value] pairs
+//   return new SvelteMap<string, number>(entries);
+
+// }

@@ -23,29 +23,29 @@ export function capitalizeText(str: string): string {
       .replace(/\b\w/g, (char) => char.toUpperCase())
   );
 }
-export type TS = {
+export type TInputElState = {
   isFocused: boolean;
   isDirty: boolean;
   placeholder: string;
   reformat: string;
 };
-const phoneRegex = /^(\+\d{1,4})?\s*(\d{3}-\d{3}-\d{4})(,\s*ext\.\s*\d{1,5})?$/;
-export function isPhoneFormatOK(str: string, s: TS) {
-  if (phoneRegex.test(str)) {
-    s.reformat = ''
-    return true
+
+export function formatPhoneNumber(value: string, s: TInputElState): string {
+  console.log('formatPhoneNumber', value)
+  // just appended ', ext. ' from extansion
+  if (value.endsWith('ext. ')) {
+    console.log('save .ext ')
+    return value
   }
-  return false
-}
-export function formatPhoneNumber(rawValue: string, s: TS): string {
+  console.log('no .ext ')
   let dialCode = ''
-  const m = rawValue.trim().match(/[^-\s ]+/g);
+  const m = value.trim().match(/[^-\s ]+/g);
   if (m && m[0].startsWith('+')) {
     dialCode = m.splice(0, 1)[0].trim();
-    rawValue = m.join('')
+    value = m.join('')
   }
 
-  const digits = rawValue.replace(/\D/g, '');
+  const digits = value.replace(/\D/g, '');
   const mainDigits = digits.slice(0, 10);
   const extDigits = digits.slice(10, 15);
 
@@ -59,7 +59,7 @@ export function formatPhoneNumber(rawValue: string, s: TS): string {
   }
 
   // Handle extension triggering
-  if (rawValue.includes(',') || extDigits.length > 0) {
+  if (digits.length === 10 && value.includes(', ext. ') || extDigits.length > 0) {
     formatted += `, ext. ${extDigits}`;
   }
 

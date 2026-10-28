@@ -4,7 +4,7 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { firstStep } from '$lib/constants';
 	// type TCountryCodes = { dialCode: string, code: string }
-	import { getCountryCodesMap, type TCountryName, type TCountryCodes } from './country-codes';
+	import { getCountryCodesMap, type TCountryName, type TCountryCodes } from './countryCodesMap';
 
 	// let ccCode = $state<ReturnType<typeof import('./CountryCodes.svelte').default> | null>(null);
 	let countryCodesMap: SvelteMap<TCountryName, TCountryCodes>;
@@ -24,6 +24,7 @@
 	let caption = $state('');
 	let value = $state('');
 	let inputEl = $state<HTMLInputElement>();
+	let countryCodesEl = $state<HTMLInputElement>();
 	if (countryCode && loadCountryMap) {
 		countryCodesMap = getCountryCodesMap();
 		console.log('countryCodesMap', countryCodesMap.size);
@@ -74,7 +75,7 @@
 	function hideCountyCodesBox(e: FocusEvent) {
 		console.log('on blur hide box');
 		countryCode = value;
-		inputEl.style.opacity = '0';
+		inputEl!.style.opacity = '0';
 	}
 </script>
 
@@ -91,8 +92,7 @@ onblur={hideCountyCodesBox}
 	class="country-codes"
 	type="text"
 	placeholder="Start entering country name"
-	onkeyup={countryCodesKeyup}
-	oninput={searchCountryName}
+	oninput={searchCountry}
 />
 
 <style lang="scss">
@@ -104,12 +104,6 @@ onblur={hideCountyCodesBox}
 		position: relative;
 		padding-left: 0;
 		border: 3px solid blue;
-		z-index: 101;
-		&::before {
-			position: absolute;
-			content: var(--country-candidates);
-			top: 2rem;
-			left: 0;
-		}
+		z-index: 10;
 	}
 </style>

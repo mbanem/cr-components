@@ -1,105 +1,118 @@
+
+
+
+
+
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
+
+// import before delare global !
+
+import type { THandleTryCatch } from '$lib/utils/helpers';
 declare global {
-
-	interface String {
-		/**
-		 * Pretvara prvo slovo stringa u veliko.
-		 */
-		capitalize(): string
-	}
-	interface Number {
-		/**
-		 * Allows numbers to be iterated up to their value.
-		 */
-		[Symbol.iterator](): IterableIterator<number>
-	}
-
-	const log: typeof console.log;
-
-	export type TCountryCodeBox = 'small' | 'expanded' | 'none'
-	export type TEnum = Record<string, string>;
-	export type TEnums = Record<string, TEnum>;
-	export type Field = {
-		name: string
-		type: string
-		isArray: boolean
-		isOptional: boolean
-		isDataEntry: boolean
-		attrs?: string
-		permissions?: string
-	}
-	// no name; it should be part of Models with their name as a key
-	export type Model = {
-		fields: Field[]
-		attrs?: string[]
-		permissions?: string
-	}
-	export type Models = Record<string, Model>
-	export type RouteName = string
-	export type ModelName = string
-	export type SelectedModel = Record<
-		ModelName,
-		{
-			routeName: string
-			permissions?: string
-		}
-	>
-	export type SelectedModels = Record<RouteName, SelectedModel>
-	export type TComponentType = 'RadioGroup' | 'CheckboxGroup'
-
-	// Ensure your base list includes all allowed events (including your examples like mouseenter/mouseleave)
-	const VALID_EVENTS = [
-		'Enter',
-		'input',
-		'change',
-		'keyup',
-		'keypress',
-		'keydown',
-		'blur',
-		'focus',
-		'paste',
-		'mouseenter',
-		'mouseleave'
-	] as const;
-
-	type TSingleReportOn = (typeof VALID_EVENTS)[number];
-
-	// export type TSingleReportOn = 'Enter' | 'input' | 'change' | 'keyup' | 'keypress' | 'keydown' | 'blur' | 'focus' | 'paste';
-	export type TReportOnUnion<T extends string = TSingleReportOn> =
-		| T
-		| `${T}|${T}`
-		| `${T}|${T}|${T}`
-
-	export type TReportOn = TReportOnUnion | TSingleReportOn[];
-
-	// Allows single triggers, pipe-separated triggers (e.g. "paste|keyup|Enter"), or arrays
-	// do not include | (string & {}) | as it allowes any string or empty objeect
-	// without defining develo[men time error squiggles
-	export type TReportOnInput = TReportOn | TReportOn[];
-
-	export type TCallback = (value: string) => void;
-
-	type TTimer = ReturnType<typeof setTimeout>;
-	export type TRCValue = [value: string, checked?: boolean]
-	export type TChRbGroup = Record<string, string | TCRValue>
-	export type TCheckboxGroup = string[]
-
-	namespace App {
-		// interface Error {}                    // optional: custom error shape
-		interface Locals {
-			user: UserPartial
-			role: 'ADMIN' | 'USER' | 'VISITOR' | 'MODERATOR'
-			session: {
-				id: string
-				expires: string
-			} | null
-		}
-
-		// interface PageData {}                 // optional: shared page data
-		// interface Platform {}                 // optional: for server-only env in load
-	}
+	var log: typeof console.log;
+	var handleTryCatch: THandleTryCatch;
 }
+
+interface String {
+	/**
+	 * Pretvara prvo slovo stringa u veliko.
+	 */
+	capitalize(): string
+}
+
+interface Number {
+	/**
+	 * Allows numbers to be iterated up to their value.
+	 */
+	[Symbol.iterator](): IterableIterator<number>
+}
+
+
+
+export type TCountryCodeBox = 'small' | 'expanded' | 'none'
+export type TEnum = Record<string, string>;
+export type TEnums = Record<string, TEnum>;
+export type Field = {
+	name: string
+	type: string
+	isArray: boolean
+	isOptional: boolean
+	isDataEntry: boolean
+	attrs?: string
+	permissions?: string
+}
+// no name; it should be part of Models with their name as a key
+export type Model = {
+	fields: Field[]
+	attrs?: string[]
+	permissions?: string
+}
+export type Models = Record<string, Model>
+export type RouteName = string
+export type ModelName = string
+export type SelectedModel = Record<
+	ModelName,
+	{
+		routeName: string
+		permissions?: string
+	}
+>
+export type SelectedModels = Record<RouteName, SelectedModel>
+export type TComponentType = 'RadioGroup' | 'CheckboxGroup'
+
+// Ensure your base list includes all allowed events (including your examples like mouseenter/mouseleave)
+const VALID_EVENTS = [
+	'Enter',
+	'input',
+	'change',
+	'keyup',
+	'keypress',
+	'keydown',
+	'blur',
+	'focus',
+	'paste',
+	'mouseenter',
+	'mouseleave'
+] as const;
+
+type TSingleReportOn = (typeof VALID_EVENTS)[number];
+
+// export type TSingleReportOn = 'Enter' | 'input' | 'change' | 'keyup' | 'keypress' | 'keydown' | 'blur' | 'focus' | 'paste';
+export type TReportOnUnion<T extends string = TSingleReportOn> =
+	| T
+	| `${T}|${T}`
+	| `${T}|${T}|${T}`
+
+export type TReportOn = TReportOnUnion | TSingleReportOn[];
+
+// Allows single triggers, pipe-separated triggers (e.g. "paste|keyup|Enter"), or arrays
+// do not include | (string & {}) | as it allowes any string or empty objeect
+// without defining develo[men time error squiggles
+export type TReportOnInput = TReportOn | TReportOn[];
+
+export type TCallback = (value: string) => void;
+
+type TTimer = ReturnType<typeof setTimeout>;
+export type TRCValue = [value: string, checked?: boolean]
+export type TChRbGroup = Record<string, string | TCRValue>
+export type TCheckboxGroup = string[]
+
+namespace App {
+	// interface Error {}                    // optional: custom error shape
+	interface Locals {
+		user: UserPartial
+		role: 'ADMIN' | 'USER' | 'VISITOR' | 'MODERATOR'
+		session: {
+			id: string
+			expires: string
+		} | null
+	}
+
+	// interface PageData {}                 // optional: shared page data
+	// interface Platform {}                 // optional: for server-only env in load
+}
+
 
 // ──────────────────────────────────────────────────────────────
 // 2. Augment Svelte component module ($$Props, $$Events, $$Slots)
@@ -346,7 +359,6 @@ declare global {
 		updatedAt: Date | null
 	}
 
-}
 }
 
 export { };
