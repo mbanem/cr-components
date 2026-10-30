@@ -8,10 +8,10 @@
 
 // import before delare global !
 
-import type { THandleTryCatch } from '$lib/utils/helpers';
+
 declare global {
 	var log: typeof console.log;
-	var handleTryCatch: THandleTryCatch;
+
 }
 
 interface String {
@@ -362,3 +362,11 @@ declare global {
 }
 
 export { };
+
+
+
+import type { TSafeCall } from '$lib/utils/helpers';
+
+declare global {
+	var safeCall: TSafeCall;
+}

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { handleTryCatch } from '$lib/utils/helpers';
-	globalThis.handleTryCatch = handleTryCatch;
+	import { safeCall } from '$lib/utils/helpers';
+	globalThis.safeCall = safeCall;
 	import favicon from '$lib/assets/favicon.svg';
 	let { children } = $props();
 	import '$styles/components.scss';

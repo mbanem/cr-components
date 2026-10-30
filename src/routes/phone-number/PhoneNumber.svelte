@@ -105,33 +105,33 @@
 		if (val.endsWith('ext. ') || s.reformat) return val;
 
 		try {
-	let dialCode = '';
+			let dialCode = '';
 			const m = val.trim().match(/[^-\s ]+/g);
 			if (m && m[0].startsWith('+')) {
 				dialCode = m.splice(0, 1)[0].trim();
 				val = m.join('');
 			}
-	
+
 			const digits = val.replace(/\D/g, '');
 			const mainDigits = digits.slice(0, 10);
 			const extDigits = digits.slice(10, 15);
-	
+
 			let formatted = mainDigits;
 			if (mainDigits.length >= 6) {
 				formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3, 6)}-${mainDigits.slice(6)}`;
 			} else if (mainDigits.length >= 3) {
 				formatted = `${mainDigits.slice(0, 3)}-${mainDigits.slice(3)}`;
 			}
-	
+
 			if ((digits.length === 10 && val.includes(', ext. ')) || extDigits.length > 0) {
 				formatted += `, ext. ${extDigits}`;
 			}
-	
+
 			s.reformat = '';
 			return dialCode ? `${dialCode} ${formatted}` : formatted;
-} catch (err) {
-	handleTryCatch(err, 'formatPhoneNumber');
-}
+		} catch (err) {
+			handleTryCatch(err, 'formatPhoneNumber');
+		}
 
 		return val;
 	}
