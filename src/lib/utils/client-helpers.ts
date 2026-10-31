@@ -48,6 +48,10 @@ export function stringToFieldObject(line: string) {
   return JSON.parse((raw as string).slice(0, -3) + '\n\t}')
 }
 
+export function isEmpty<T extends object>(obj: T) {
+  return Object.keys(obj).length === 0
+}
+
 // returning tuple has the following type
 export type TupleFieldAttrs = [string, string, boolean, boolean, string]
 // returns an array of attribute values as quotted if non-booleans
