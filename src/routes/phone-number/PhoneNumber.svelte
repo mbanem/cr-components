@@ -4,7 +4,6 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { setCssVarColor, capitalizeText } from '$lib/utils';
 	import { getCountryCodesMap, type TCountryName, type TCountryCodes } from './countryCodesMap';
-	import { preventDefault } from 'svelte/legacy';
 
 	const commaKeyMessage = 'press comma key for extension';
 	const phoneFormat = 'in format xxx-xxx-xxxx, ext. xx\nwith text-overflow: ellipsis;';
@@ -93,9 +92,13 @@
 	const phoneRegex = /^(\+\d{1,4})?\s*(\d{3}-\d{3}-\d{4})(,\s*ext\.\s*\d{1,5})?$/;
 
 	function isPhoneFormatOK(str: string): boolean {
-		if (phoneRegex.test(str)) {
-			s.reformat = '';
-			return true;
+		try {
+			if (phoneRegex.test(str)) {
+				s.reformat = '';
+				return true;
+			}
+		} catch (err: unknown) {
+			handleTryCatch(err, 'isPhoneFormatOK');
 		}
 
 		return false;
@@ -204,8 +207,12 @@
 	);
 
 	function dispatchValue(eventType: TSingleReportOn) {
-		if (reportOn.includes(eventType) && onValueChange) {
-			onValueChange(value);
+		try {
+			if (reportOn.includes(eventType) && onValueChange) {
+				onValueChange(value);
+			}
+		} catch (err: unknown) {
+			handleTryCatch(err, 'dispatchValue');
 		}
 	}
 

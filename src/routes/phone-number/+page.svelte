@@ -32,6 +32,7 @@
 	}
 
 	let cc = $state(true);
+	log('Here we test global log');
 </script>
 
 <button onclick={() => (cc = !cc)} class="mb-4 rounded bg-blue-500 px-4 py-2 text-white">

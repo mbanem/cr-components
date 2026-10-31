@@ -1,17 +1,11 @@
-
-
-
-
-
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 
 // import before delare global !
-
-
+import type { THandleTryCatch } from '$lib/utils/helpers';
 declare global {
 	var log: typeof console.log;
-
+	var handleTryCatch: THandleTryCatch;
 }
 
 interface String {
