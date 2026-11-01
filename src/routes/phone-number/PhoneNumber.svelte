@@ -167,7 +167,7 @@
 	}) as string;
 
 	let timer: ReturnType<typeof setTimeout>;
-	const cleatTimeoutMsgs = () => {
+	const clearTimeoutMsgs = () => {
 		// clearTimeout(timer!);
 		timeoutActionMsg = maxLengthMsg = '';
 	};
@@ -176,7 +176,7 @@
 
 		if ((v.phoneLength === MAXLENGTH && maxLengthMsg) || timeoutActionMsg) {
 			setTimeout(() => {
-				cleatTimeoutMsgs();
+				clearTimeoutMsgs();
 			}, 2500);
 			return timeoutActionMsg || maxLengthMsg;
 		}

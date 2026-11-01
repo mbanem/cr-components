@@ -9,8 +9,13 @@ export type THandleTryCatch = (err: unknown, info?: string) => void;
 
 export const handleTryCatch: THandleTryCatch = (
 	err,
-	info
+	info?
 ) => {
 	const msg = err instanceof Error ? err.message : String(err);
 	console.error(info, msg);
 };
+
+// export const handleTryCatch: THandleTryCatch = function (err, info) {
+// 	const msg = err instanceof Error ? err.message : String(err);
+// 	console.error(info, msg);
+// };

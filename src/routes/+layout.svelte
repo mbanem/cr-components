@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { handleTryCatch } from '$lib/utils/helpers';
+	// import { handleTryCatch } from '$lib/utils/helpers';
 
-	(
-		globalThis as typeof globalThis & {
-			handleTryCatch: typeof handleTryCatch;
-		}
-	).handleTryCatch = handleTryCatch;
-	(
-		globalThis as typeof globalThis & {
-			log: typeof console.log;
-		}
-	).log = console.log;
+	// globalThis.handleTryCatch = console.handleTryCatch;
+	// (
+	// 	globalThis as typeof globalThis & {
+	// 		handleTryCatch: typeof handleTryCatch;
+	// 	}
+	// ).handleTryCatch = handleTryCatch;
+	// (
+	// 	globalThis as typeof globalThis & {
+	// 		log: typeof console.log;
+	// 	}
+	// ).log = console.log;
+	// globalThis.log = console.log;
 
 	import favicon from '$lib/assets/favicon.svg';
 	let { children } = $props();
