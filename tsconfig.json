@@ -16,5 +16,6 @@
 		// }
 	},
 	"exclude": ["node_modules", ".vscode", "**/*.spec.ts", "**/*.test.ts"]
+	// "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
 	// REMOVED: "include" and "exclude" arrays are deleted
 }

@@ -168,8 +168,12 @@
 
 	let timer: ReturnType<typeof setTimeout>;
 	const clearTimeoutMsgs = () => {
-		// clearTimeout(timer!);
-		timeoutActionMsg = maxLengthMsg = '';
+		try {
+			// clearTimeout(timer!);
+			timeoutActionMsg = maxLengthMsg = '';
+		} catch (err: unknown) {
+			handleTryCatch(err, 'clearTimeoutMsgs');
+		}
 	};
 	const errorMessage = $derived.by(() => {
 		if (!s.isDirty && !s.isFocused && !timeoutActionMsg) return '';
