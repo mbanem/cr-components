@@ -132,7 +132,7 @@
 
 			s.reformat = '';
 			return dialCode ? `${dialCode} ${formatted}` : formatted;
-		} catch (err) {
+		} catch (err: unknown) {
 			handleTryCatch(err, 'formatPhoneNumber');
 		}
 
@@ -460,6 +460,7 @@
 		await tick();
 		countryCodesEl?.focus();
 	}
+	log('we write via log');
 </script>
 
 <div class="grid-container">

@@ -1,6 +1,8 @@
 import type { THandleTryCatch } from '$lib/utils/helpers';
 declare global {
 	var handleTryCatch: THandleTryCatch;
+	var log: typeof console.log
+
 	// See https://svelte.dev/docs/kit/types#app.d.ts
 	// for information about these interfaces
 

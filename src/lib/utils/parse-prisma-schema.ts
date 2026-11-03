@@ -15,7 +15,7 @@ NOTE: this is mapping Prisma -> TypeScript for variable types
 <input type="datetime-local">
 browsers return value as string and server must convert new Date(value)
 
-  prisma/schema.prisma is actually loaded by extension
+	prisma/schema.prisma is actually loaded by extension
 */
 import { stringToFieldObject, handleTryCatch, isEmpty } from '$lib/utils';
 
@@ -195,7 +195,11 @@ const prismaTypeRegex = new RegExp(`\\b(${Object.keys(typeConversionMap).join('|
 
 // return line with conversion into TypeScript type
 function convertPrismaTypesToTS(line: string): string {
-	return line.replace(prismaTypeRegex, (prismaType) => typeConversionMap[prismaType]);
+	try {
+		return line.replace(prismaTypeRegex, (prismaType) => typeConversionMap[prismaType]);
+	} catch (err: unknown) {
+		handleTryCatch(err, 'convertPrismaTypesToTS');
+	}
 }
 
 // the main function to generate models sort fields to sync with ordered names and restur models
@@ -204,12 +208,12 @@ export function parsePrismaSchema(schemaContent: string): { models: Models; enum
 	// to be stuff in owning model
 	let fields: Field[] = [];
 	let modelMatch;
-
+	log('parsePrismaSchema', schemaContent.length);
 	try {
 		// extract model name and body holding all field descriptions
 		while ((modelMatch = modelRegex.exec(schemaContent)) !== null) {
 			const [, modelName, body] = modelMatch; // skip zero match item as it holds the whole search string
-
+			log('modelName', modelName)
 			const modelAttrs: string[] = [];
 			// Remove block comments /* ... */ first
 			const bodyWithoutBlocks = body.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -222,6 +226,7 @@ export function parsePrismaSchema(schemaContent: string): { models: Models; enum
 
 			// lines are trimmed already
 			for (let line of lines) {
+				log('line', line)
 				if (line.startsWith('//')) {
 					continue;
 				}
@@ -247,11 +252,12 @@ export function parsePrismaSchema(schemaContent: string): { models: Models; enum
 			};
 			fields = [];
 		}
-	} catch (err) {
-		handleTryCatch(err);
+	} catch (err: unknown) {
+		handleTryCatch(err, 'parsePrismaSchema');
 	}
+
 	// console.log('models', models);
-	sortModelsByOrdered(UI.all);
+	// sortModelsByOrdered(UI.all);
 
 	let enumMatch;
 	const enums: TEnums = {};

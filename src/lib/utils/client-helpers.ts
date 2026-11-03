@@ -23,7 +23,14 @@ export function capitalizeText(str: string): string {
       .replace(/\b\w/g, (char) => char.toUpperCase())
   );
 }
-
+// created object should have the following properties
+const attrNames = [
+  '"name": ',
+  '"type": ',
+  '"isArray": ',
+  '"isOptional": ',
+  '"attrs": ',
+]
 // create an object with attrNames with attribute values
 export function stringToFieldObject(line: string) {
   if (!line) {
@@ -49,7 +56,12 @@ export function stringToFieldObject(line: string) {
 }
 
 export function isEmpty<T extends object>(obj: T) {
-  return Object.keys(obj).length === 0
+  log('isEmpty', JSON.stringify(obj))
+  try {
+    return Object.keys(obj).length === 0
+  } catch (err: unknown) {
+    handleTryCatch(err, 'isEmpty');
+  }
 }
 
 // returning tuple has the following type
