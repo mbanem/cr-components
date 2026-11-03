@@ -6,8 +6,15 @@
 		modelName: string;
 		models: Models;
 		modelsPermissions: (modelName: string, model: Model) => void;
+		childCallingParent: (name: string) => void;
 	};
-	let { userRoles, modelName, models = $bindable(), modelsPermissions }: TProps = $props();
+	let {
+		userRoles,
+		modelName,
+		models = $bindable(),
+		modelsPermissions,
+		childCallingParent
+	}: TProps = $props();
 	// model holds set of selected roles
 	const rolesMap = new SvelteMap<string, SvelteSet<string>>();
 
@@ -17,7 +24,7 @@
 	let wrapperEl: HTMLElement; // Scoped reference to this specific row wrapper
 
 	export function openRolesSelector(targetModelName: string) {
-		console.log('openRolesSelector entry point', modelName);
+		// console.log('openRolesSelector entry point', modelName);
 		if (targetModelName !== modelName) return;
 
 		let el = document.getElementById(modelName) as HTMLElement;
@@ -27,7 +34,7 @@
 	}
 
 	async function roleSelected(el: HTMLElement, model: string) {
-		console.log('role selected', model);
+		// console.log('role selected', model);
 		selectedModelName = model;
 
 		if (dropdownEl && wrapperEl) {
@@ -38,8 +45,10 @@
 			});
 			dropdownEl.classList.toggle('hidden');
 		}
+		// TODO console.log('# of selectedModels', Object.keys(selectedModels).length)
 	}
 	function toggleRole(e: MouseEvent, model: string, role: string) {
+		log('toggleRole called', model, role);
 		e.preventDefault();
 		let set = rolesMap.get(model);
 

@@ -47,7 +47,7 @@ declare global {
 			permissions?: string
 		}
 	>
-	export type SelectedModels = Record<RouteName, SelectedModel>
+	export type SelectedModels = SvelteMap<RouteName, SelectedModel>
 	export type TComponentType = 'RadioGroup' | 'CheckboxGroup'
 
 	// Ensure your base list includes all allowed events (including your examples like mouseenter/mouseleave)

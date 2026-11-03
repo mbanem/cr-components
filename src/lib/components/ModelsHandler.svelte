@@ -9,7 +9,6 @@
 	// Track child component references per model name
 	// when click on a modelname checkbox call openRolesSelector method on userRolesEls[modelName]
 	let userRolesEls = $state<Record<string, ReturnType<typeof CRUserRolesSelect>>>({});
-
 	// export type CBModels = Record<string, HTMLInputElement>;
 	export type TProps = {
 		models: Models;
@@ -69,11 +68,26 @@
 	// 	}
 	// }
 
-	const modelsPermissions = (modelName: string, model: Model) => {
-		// console.log(modelName, model.permissions, cbGroup);
-		if (models[modelName]) {
-			models[modelName].permissions = model.permissions;
+	const childCallingParent = (msg: string) => {
+		g.innerText = msg;
+	};
+
+	export const modelsPermissions = (modelName: string, model: Model) => {
+		console.log('ModelHandler.svelte modelsPermissions called', modelName, model.permissions);
+		// 	modelName,
+		// 	model.permissions,
+		// 	cbGroup
+		// );
+		if (model.permissions) {
+			if (!selectedModels.has(modelName)) {
+				selectedModels.set(modelName, model);
+			}
+		} else {
+			selectedModels.delete(modelName);
 		}
+		// if (models[modelName]) {
+		// 	models[modelName].permissions = model.permissions;
+		// }
 		const cb = modelWrapperEl?.querySelector(
 			`input[type=checkbox][value=${modelName}]`
 		) as HTMLInputElement;
@@ -387,6 +401,7 @@
 		bind:models
 		{modelName}
 		{modelsPermissions}
+		{childCallingParent}
 	/>
 {/snippet}
 
