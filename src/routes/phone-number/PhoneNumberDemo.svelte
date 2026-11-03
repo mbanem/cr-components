@@ -70,7 +70,7 @@ $effect v {JSON.stringify(v, null, 2)}
 
 <style lang="scss">
 	.rounded {
-		margin-left: 14rem;
+		margin: -1rem 0 0 16rem;
 	}
 	.demo-wrapper {
 		position: relative;

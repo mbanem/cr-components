@@ -35,7 +35,11 @@
 	log('Here we test global log');
 </script>
 
-<button onclick={() => (cc = !cc)} class="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
+<button
+	onclick={() => (cc = !cc)}
+	class="mb-4 rounded bg-blue-500 px-4 py-2 text-white"
+	style="margin: 1rem 0 0.5rem 18rem !important;"
+>
 	toggle countryCodes: {cc ? 'ON' : 'OFF'}
 </button>
 

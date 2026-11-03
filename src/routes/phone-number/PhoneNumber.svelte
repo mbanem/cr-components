@@ -7,8 +7,8 @@
 
 	const commaKeyMessage = 'press comma key for extension';
 	const phoneFormat = 'in format xxx-xxx-xxxx, ext. xx\nwith text-overflow: ellipsis;';
-	export const REFORMAT = 'DONE? Hit Enter to reformat';
-	export const isGreen = /(press comma|DONE\?)/;
+	export const REFORMAT = 'Hit Enter to reformat';
+	export const isGreen = /(press comma|Hit\?)/;
 	export const noPhoneDialRequired = 'No phone Dial Code required';
 	export const MAXLENGTHMSG = 'maximum length reached';
 	export const MAXLENGTH = 24;
@@ -312,7 +312,7 @@
 				const isAtEnd = v.caretStart === value.length;
 				if (v.phoneLength === 12 && isAtEnd && !value.endsWith(',')) {
 					e.preventDefault();
-					value += ' ext. ';
+					value += ', ext. ';
 					return;
 				}
 			}
@@ -333,7 +333,7 @@
 					if (v.dialCodeLength && v.dialCodeLength === v.caretStart) {
 						v.dialCode = '';
 						value = value.slice(v.dialCodeLength + 1);
-					} else if (v.inTheMiddle) {
+					} else if (v.inTheMiddle && !isPhoneFormatOK(value)) {
 						s.reformat = REFORMAT;
 					}
 				}
