@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Tooltip from '$lib/components/CReactiveTooltip.svelte';
-	import type { PageProps } from '../$types';
+	import type { PageProps, PageData } from '../$types';
 	// import ModelsHandler from './ModelsHandler.svelte';
 	import ModelsHandler from './ModelsHandler.svelte';
 	let tooltip: Tooltip;
