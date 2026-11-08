@@ -67,14 +67,15 @@
   color: $cr-disabled-color;
 }
 
-/* bot input boxes got style from mixin cr-input-base */
+/* bot input boxes got style from mixin cr-input-base 
+  NOTE no z-index allowed here
+*/
 .cr-input,
 .country-codes {
   position: absolute;
   top: 0;
   left: 0;
   @include cr-input-base;
-  z-index: -2;
 }
 
 .cr-input.allow-codes {

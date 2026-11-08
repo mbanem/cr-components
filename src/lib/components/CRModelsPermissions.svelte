@@ -6,15 +6,8 @@
 		modelName: string;
 		models: Models;
 		modelsPermissions: (modelName: string, model: Model) => void;
-		childCallingParent: (name: string) => void;
 	};
-	let {
-		userRoles,
-		modelName,
-		models = $bindable(),
-		modelsPermissions,
-		childCallingParent
-	}: TProps = $props();
+	let { userRoles, modelName, models = $bindable(), modelsPermissions }: TProps = $props();
 	// model holds set of selected roles
 	const rolesMap = new SvelteMap<string, SvelteSet<string>>();
 
@@ -45,8 +38,8 @@
 			});
 			dropdownEl.classList.toggle('hidden');
 		}
-		// TODO console.log('# of selectedModels', Object.keys(selectedModels).length)
 	}
+
 	function toggleRole(e: MouseEvent, model: string, role: string) {
 		log('toggleRole called', model, role);
 		e.preventDefault();

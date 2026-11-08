@@ -11,6 +11,27 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { setCssVarColor } from '$lib/utils/client-helpers';
 
+	const VALID_EVENTS = [
+		'Enter',
+		'input',
+		'change',
+		'keyup',
+		'keypress',
+		'keydown',
+		'blur',
+		'focus',
+		'paste',
+		'mouseenter',
+		'mouseleave'
+	] as const;
+
+	// type TSingleReportOn = (typeof VALID_EVENTS)[number];
+
+	// // export type TSingleReportOn = 'Enter' | 'input' | 'change' | 'keyup' | 'keypress' | 'keydown' | 'blur' | 'focus' | 'paste';
+	// type TReportOnUnion<T extends string = TSingleReportOn> = T | `${T}|${T}` | `${T}|${T}|${T}`;
+
+	// type TReportOn = TReportOnUnion | TSingleReportOn[];
+
 	type TCapitalize =
 		'lowercase' | 'uppercase' | 'capitalize' | 'paste' | 'keyup' | 'keydown' | 'none';
 
@@ -23,6 +44,7 @@
 		capitalize?: TCapitalize;
 		isDisabled?: boolean;
 		allowedChars?: string;
+		notAllowedChar?: string;
 		isErroneous?: (val: string) => string;
 	}
 
@@ -37,11 +59,13 @@
 		class: className = '',
 		isDisabled = false,
 		allowedChars = '',
+		notAllowedChar = $bindable(),
 		isErroneous,
 
 		...restProps
 	}: PROPS = $props();
 
+	const doubleTripleRx: RegExp = /([a-zA-Z])\1\1|--/g;
 	// derived.by is an arrow function and so it is reactive
 	// for all its variables involved
 	const rxAllowed = $derived.by(() => {
@@ -142,12 +166,12 @@
 			}
 		}
 		// if (reportOn.includes(e.type)) {
-		dispatchValue(e.type as TReportOn);
+		dispatchValue(e.type as TSingleReportOn);
 		// }
 	}
 
 	function handleKeyup(e: KeyboardEvent) {
-		dispatchValue(e.type as TReportOn);
+		dispatchValue(e.type as TSingleReportOn);
 	}
 
 	function handleBlur(e: FocusEvent) {
@@ -160,7 +184,7 @@
 			return new Promise((resolve) => setTimeout(resolve, 300));
 		});
 
-		dispatchValue(e.type as TReportOn);
+		dispatchValue(e.type as TSingleReportOn);
 	}
 
 	function handleFocus(e: FocusEvent) {
@@ -170,16 +194,23 @@
 			return new Promise((resolve) => setTimeout(resolve, 300));
 		});
 		s.isFocused = true;
-		dispatchValue(e.type as TReportOn);
+		dispatchValue(e.type as TSingleReportOn);
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
-		if ((!rxAllowed.test(e.key) || value.length === s.maxLength) && e.key !== 'Backspace') {
+		const match = (value + e.key).match(doubleTripleRx);
+		if (
+			(!rxAllowed.test(e.key) || match || value.length === s.maxLength) &&
+			e.key !== 'Backspace'
+		) {
 			e.preventDefault();
+			if (!rxAllowed.test(e.key) || match) {
+				notAllowedChar = e.key + match?.[0];
+			}
 			return;
 		}
 
-		dispatchValue(e.type as TReportOn);
+		dispatchValue(e.type as TSingleReportOn);
 	}
 </script>
 

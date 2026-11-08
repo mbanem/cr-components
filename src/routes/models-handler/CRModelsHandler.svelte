@@ -376,18 +376,12 @@
 		if (e.type === 'mouseenter') {
 			clearTimeout(timer as NodeJS.Timeout);
 			timer = setTimeout(() => {
-				tooltip.showTooltip(
-					e,
-					`will be the route name,${appName}/src/routes/<b>${val}</b>`,
-					3000,
-					'above',
-					{
-						color: 'navy',
-						border: '1px solid gray',
-						backgroundColor: '#f1f1f1',
-						padding: '2px 5px'
-					}
-				);
+				tooltip.showTooltip(e, `Route Name,${appName}/src/routes/<b>${val}</b>`, 3000, 'above', {
+					color: 'navy',
+					border: '1px solid gray',
+					backgroundColor: '#f1f1f1',
+					padding: '2px 5px'
+				});
 			}, 700);
 		} else if (e.type === 'mouseleave') {
 			tooltip.hide();

@@ -3,7 +3,7 @@
 	import PhoneNumber, {
 		type PROPS as PhoneNumberProps,
 		type TValueAttrs
-	} from './PhoneNumber.svelte';
+	} from '$lib/components/PhoneNumber.svelte';
 
 	let {
 		value = $bindable(''),

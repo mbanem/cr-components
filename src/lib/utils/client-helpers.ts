@@ -55,6 +55,19 @@ export function stringToFieldObject(line: string) {
   return JSON.parse((raw as string).slice(0, -3) + '\n\t}')
 }
 
+export function anyMissing(anObject: Record<string, any>): boolean {
+  // Matches empty string, whitespace-only, '0', 'null', or 'undefined'
+  const missingRegex = /^(\s*|0|null|undefined)$/
+
+  return Object.values(anObject).some((val) => missingRegex.test(String(val)))
+}
+
+export const sixHash = () => {
+  const a = (Math.random() * 46656) | 0
+  const b = (Math.random() * 46656) | 0
+  return a.toString(36).slice(-3) + b.toString(36).slice(-3)
+}
+
 export function isEmpty<T extends object>(obj: T) {
   log('isEmpty', JSON.stringify(obj))
   try {

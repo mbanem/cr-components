@@ -291,7 +291,7 @@
 				<div class="checkbox-item">
 					<label for={comp}
 						><input id={comp} type="checkbox" value={comp} bind:group={crComponents} />
-						{comp} component
+						{comp}
 					</label>
 				</div>
 				<p
@@ -300,7 +300,7 @@
 					role="presentation"
 					style="cursor:pointer;"
 				>
-					show {comp} in action
+					show in action
 				</p>
 			{/each}
 		</div>

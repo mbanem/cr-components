@@ -21,7 +21,7 @@ declare global {
 
 	export type TCountryCodeBox = 'small' | 'expanded' | 'none'
 	export type TEnum = Record<string, string>;
-	export type TEnums = Record<string, TEnum>;
+	export type TEnums = SvelteMap<string, TEnum>;
 	export type Field = {
 		name: string
 		type: string
@@ -37,10 +37,11 @@ declare global {
 		attrs?: string[]
 		permissions?: string
 	}
-	export type Models = Record<string, Model>
 	export type RouteName = string
 	export type ModelName = string
-	export type SelectedModel = Record<
+	export type EnumName = string
+	export type Models = SvelteMap<string, Model>
+	export type SelectedModel = SvelteMap<
 		ModelName,
 		{
 			routeName: string
@@ -50,8 +51,10 @@ declare global {
 	export type SelectedModels = SvelteMap<RouteName, SelectedModel>
 	export type TComponentType = 'RadioGroup' | 'CheckboxGroup'
 
+	type TCallbackFunc = (() => void) | undefined
+	export type DbParams = Record<string, string | number>
 	// Ensure your base list includes all allowed events (including your examples like mouseenter/mouseleave)
-	const VALID_EVENTS = [
+	export const VALID_EVENTS = [
 		'Enter',
 		'input',
 		'change',
@@ -65,7 +68,7 @@ declare global {
 		'mouseleave'
 	] as const;
 
-	type TSingleReportOn = (typeof VALID_EVENTS)[number];
+	export type TSingleReportOn = (typeof VALID_EVENTS)[number];
 
 	// export type TSingleReportOn = 'Enter' | 'input' | 'change' | 'keyup' | 'keypress' | 'keydown' | 'blur' | 'focus' | 'paste';
 	export type TReportOnUnion<T extends string = TSingleReportOn> =
@@ -178,6 +181,7 @@ declare global {
 
 	// declare module 'FrontBackButton' {
 	// 	import { SvelteComponentTyped } from 'svelte'
+	import { ModelFields } from './lib/utils/parse-prisma-schema';
 	// 	interface FBButtonProps
 	// 		extends svelte.JSX.HTMLAttributes<HTMLElementTagNameMap['HTMLButtonElement']> {
 	// 		target_href: string

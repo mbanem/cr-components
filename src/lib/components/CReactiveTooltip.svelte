@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 
-	type TStick = 'left' | 'right' | 'above' | 'below';
+	type TStick = 'left' | 'right' | 'above' | 'top' | 'bottom' | 'below';
 	type TPos = { x: number; y: number };
 	type THovered = MouseEvent | HTMLElement | TPos;
 
@@ -70,11 +70,13 @@
 						fits = rect.left >= tooltipRect.width + gap + 2 * buttonGap;
 						break;
 					case 'below':
+					case 'bottom':
 						testX = rect.left + rect.width / 2 - tooltipRect.width / 2;
 						testY = rect.bottom + gap;
 						fits = viewportHeight - rect.bottom >= tooltipRect.height + gap;
 						break;
 					case 'above':
+					case 'top':
 						testX = rect.left + rect.width / 2 - tooltipRect.width / 2;
 						testY = rect.top - tooltipRect.height - gap - buttonGap;
 						fits = rect.top >= tooltipRect.height + gap + buttonGap;
@@ -156,7 +158,7 @@
 		try {
 			timeout = timeout_;
 			if (tooltipEl !== undefined) {
-				tooltipEl.style.opacity='1'
+				tooltipEl.style.opacity = '1';
 				return;
 			}
 
@@ -251,9 +253,9 @@
 			console.error('showTooltip failed:', err);
 		}
 	}
-	export function hide(){
-		if(tooltipEl){
-			tooltipEl.style.opacity='0'
+	export function hide() {
+		if (tooltipEl) {
+			tooltipEl.style.opacity = '0';
 		}
 	}
 </script>

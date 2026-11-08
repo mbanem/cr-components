@@ -2,13 +2,14 @@
 	import { tick, onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { capitalize, stringToFieldObject } from '$lib/utils';
-	import Tooltip from '$lib/components/CReactiveTooltip.svelte';
-	import CRUserRolesSelect from '$lib/components/CRModelsPermissions.svelte';
+	// import Tooltip from '$lib/components/CReactiveTooltip.svelte';
+	import Tooltip from '$lib/utils/reactive-tooltip';
+	import ModelPermissions from '$lib/components/CRModelsPermissions.svelte';
 
-	let tooltip: ReturnType<typeof Tooltip>;
+	let tooltip: Tooltip = new Tooltip();
 	// Track child component references per model name
 	// when click on a modelname checkbox call openRolesSelector method on userRolesEls[modelName]
-	let userRolesEls = $state<Record<string, ReturnType<typeof CRUserRolesSelect>>>({});
+	let userRolesEls = $state<Record<string, ReturnType<typeof ModelPermissions>>>({});
 	// export type CBModels = Record<string, HTMLInputElement>;
 	export type TProps = {
 		models: Models;
@@ -67,10 +68,6 @@
 	// 		}
 	// 	}
 	// }
-
-	const childCallingParent = (msg: string) => {
-		g.innerText = msg;
-	};
 
 	export const modelsPermissions = (modelName: string, model: Model) => {
 		console.log('ModelHandler.svelte modelsPermissions called', modelName, model.permissions);
@@ -229,7 +226,7 @@
 	}
 
 	async function deleteModel(e: MouseEvent, targetModelName: string) {
-		tooltip!.showTooltip(e, `Model "${targetModelName}" to be removed.`, 2000, 'above', {
+		tooltip.show(e, `Model "${targetModelName}" to be removed.`, 2000, 'above', {
 			color: 'crimson',
 			backgroundColor: '#fff0f0',
 			border: '1px solid crimson'
@@ -338,18 +335,12 @@
 		if (e.type === 'mouseenter') {
 			clearTimeout(timer as NodeJS.Timeout);
 			timer = setTimeout(() => {
-				tooltip.showTooltip(
-					e,
-					`will be the route name,${appName}/src/routes/<b>${val}</b>`,
-					3000,
-					'above',
-					{
-						color: 'navy',
-						border: '1px solid gray',
-						backgroundColor: '#f1f1f1',
-						padding: '2px 5px'
-					}
-				);
+				tooltip.show(e, `Route Name,${appName}/src/routes/<b>${val}</b>`, 3000, 'above', {
+					color: 'navy',
+					border: '1px solid gray',
+					backgroundColor: '#f1f1f1',
+					padding: '2px 5px'
+				});
 			}, 700);
 		} else if (e.type === 'mouseleave') {
 			tooltip.hide();
@@ -395,13 +386,12 @@
 </div>
 
 {#snippet permissions(modelName: string)}
-	<CRUserRolesSelect
+	<ModelPermissions
 		bind:this={userRolesEls[modelName]}
 		{userRoles}
 		bind:models
 		{modelName}
 		{modelsPermissions}
-		{childCallingParent}
 	/>
 {/snippet}
 
@@ -414,7 +404,10 @@
 			value={modelName.toLowerCase()}
 			onchange={exportModels}
 			onmouseenter={willBeRouteName}
-			onmouseleave={willBeRouteName}
+			onmouseleave={() => {
+				clearTimeout(timer as NodeJS.Timeout);
+				tooltip.hide();
+			}}
 			style="position:absolute;top:0;left:4px;color:var(--candidate-color);background-color:var(--candidate-bg-color);width:5rem;height:1rem;padding:0 0 0 5px;margin:4px 0 0 0;border:none;font-size:14px;"
 		/>
 		<input
@@ -488,7 +481,7 @@
 
 <div class="container">
 	<div class="schema-container">
-		<p class="orm-models-caption">ORM Models -- Table Names</p>
+		<p class="orm-models-caption">ORM Models -- and Route Names</p>
 		<!-- <p class="select-all" onclick={toggleSelectAllModels} aria-hidden={true}>(select all)</p> -->
 		<div bind:this={modelWrapperEl} class="model-wrapper">
 			{#if isLoading}
@@ -513,8 +506,6 @@
 		<button onclick={removeModel} disabled={!newModelName}>remove</button>
 	</div>
 </div>
-
-<Tooltip bind:this={tooltip} />
 
 <style lang="scss">
 	*,

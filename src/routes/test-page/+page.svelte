@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { type Snippet, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import HoverableDetails from '$lib/components/HoverableDetails.svelte';
 
 	let cbGroup = $state('');
 	let logGroups = $state([
@@ -19,7 +17,6 @@
 	let progressPercents = $state(0);
 	let currentTask = 'current task: Installing PNPM Packages';
 	let statusMessage = 'Installing PNPM packages';
-	let progressMsg = 'statusMessage';
 	let prismaInitialized = 'prismaInitialized';
 	let progressCollector = $state<Record<string, string[]>>({});
 	progressCollector['m[0]'] = [];
