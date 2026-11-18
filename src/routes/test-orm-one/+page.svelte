@@ -2,6 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import HoveringDetails from '$lib/components/HoverableDetails.svelte';
 	import Tooltip from '$lib/utils/reactive-tooltip';
+	import { tick } from 'svelte';
 	let tooltip: Tooltip = new Tooltip();
 	let rawLines = $state<string[]>(['raw line one', 'raw line 2']);
 	let isOpen = $state(false);
@@ -89,12 +90,29 @@
 		} else {
 			if (!arrDBParamsStatus.join('').includes('Params are Valid')) {
 				// console.log('[OrmmOne] showMandatoryEntries open parms are walid')
-				tooltip.show(e, validateDbParamsEl, -1, 'below');
+				tooltip.show(e, validateDbParamsEl, 3000, 'below');
 				isOpen = true;
 			} else {
 				// console.log('[OrmmOne] showMandatoryEntries close dbParams')
 				isOpen = false;
 			}
+		}
+	}
+	const sleep = async (ms: number) => {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				// ms here is a dummy but required by
+				// resolve to send out some value
+				resolve(ms);
+			}, ms);
+		});
+	};
+	async function installing() {
+		progressPercents = 0;
+		isInstalling = !isInstalling;
+		while (isInstalling && progressPercents < 100) {
+			progressPercents++;
+			await sleep(200);
 		}
 	}
 	function emptyField(k: string) {
@@ -104,9 +122,13 @@
 
 {#if isInstalling || progressPercents}
 	<div class="message-container">
-		<p style="padding:0;margin:0;grid-column:span 3;">
-			{progressPercents}% — {statusMessage}
+		<p style="padding:0;margin:0;position:relative;">
 			<progress value={progressPercents} max="100" class="progress"></progress>
+			{statusMessage}
+			<span
+				style="display:inline-block;position:absolute;top:-0.6em;left:4rem;color:black;font-size:15px;font-weight: 600;"
+				>{progressPercents}%</span
+			>
 		</p>
 	</div>
 	{#key currentTask}
@@ -167,7 +189,7 @@
 	</div>
 {/if} -->
 
-<button onclick={() => (isInstalling = !isInstalling)}>toggle isInstalling</button>
+<button onclick={installing}>toggle isInstalling</button>
 <button onclick={() => (paramsAreValid = !paramsAreValid)}>toggle paramsAreValid</button>
 
 <div class="no-credentials" bind:this={mandatoryEntriesEl}>
@@ -268,14 +290,14 @@
 	}
 	.message-container {
 		margin: 5px auto;
-		grid-column: span 3;
+		border: 1px solid blue;
 		width: 90%;
 		p {
 			font-size: 14px;
 			color: var(--candidate-color);
 		}
 		.progress {
-			width: 100%;
+			width: Z0%;
 		}
 	}
 	.logs {

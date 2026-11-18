@@ -24,7 +24,8 @@
   $width: max-content,
   $font-size: 0.95rem,
   $top: -0.65rem,
-  $left: 1.5rem) {
+  $left: 1.5rem,
+  $line-height: 0.9em) {
   position: relative;
   width: $width;
   padding: $padding;
@@ -35,6 +36,7 @@
   box-shadow: $box-shadow;
   box-sizing: $box-sizing;
   margin-top: 0.3rem;
+  line-height: $line-height;
   /* otherwise onmouseenter from below blocks pointer and fires mouseleave */
 
   &::before {
