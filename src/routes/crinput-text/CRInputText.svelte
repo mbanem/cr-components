@@ -199,10 +199,13 @@
 
 	function handleKeydown(e: KeyboardEvent) {
 		const match = (value + e.key).match(doubleTripleRx);
-		if (
-			(!rxAllowed.test(e.key) || match || value.length === s.maxLength) &&
-			e.key !== 'Backspace'
-		) {
+		if (match) {
+			e.preventDefault();
+			const n = e.key === '-' ? 2 : 3;
+			notAllowedChar = (e.key + match[0]).slice(0, n);
+			return;
+		}
+		if ((!rxAllowed.test(e.key) || value.length === s.maxLength) && e.key !== 'Backspace') {
 			e.preventDefault();
 			if (!rxAllowed.test(e.key) || match) {
 				notAllowedChar = e.key + match?.[0];

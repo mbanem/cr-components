@@ -1,0 +1,159 @@
+/* src/styles/variables.scss */
+
+
+
+/* ---------------------------------------------------------
+ Typography
+ ---------------------------------------------------------*/
+
+$cr-font-family: system-ui,
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  sans-serif;
+
+:root {
+  --cr-color-primary: #3b82f6;
+  // --cr-input-placeholder-color: hsl(0, 0%, 50%);
+  --cr-color-error: #dc2626;
+  --cr-input-error-color: #dc143c;
+  --cr-radio-group-width: 19rem;
+  --cr-disabled-color: #808080;
+
+}
+
+/*body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+}
+
+*/
+// 2. SCSS Variable Abstractions (Convenient shortcuts for development)
+// $cr-placeholder: #{var(--cr-color-placeholder, #9ca3af)};
+$cr-color-primary: #{var(--cr-color-primary, #3b82f6)};
+$cr-error: #{var(--cr-color-error, #dc2626)};
+/* ---------------------------------------------------------
+    Input
+----------------------------------------------------------*/
+
+$cr-disabled-color: #{var(--cr-disabled-color, #808080)};
+$cr-input-font-size: 1rem;
+$cr-input-padding: 6px 1rem;
+
+$cr-input-border: 1px solid gray;
+$cr-input-border-radius: 4px;
+
+$cr-input-focus-border-color: #0066cc;
+$cr-input-focus-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+
+$cr-input-placeholder-color: #{var(--cr-input-placeholder-color, #808080)};
+$cr-input-placeholder-background-color: #{var(--cr-input-placeholder-background-color, #ffffff)};
+$cr-input-placeholder-opacity: 0.5;
+
+$cr-input-color: black;
+$cr-input-error-color: #{var(--cr-input-error-color),#dc143c};
+
+$cr-input-disabled-opacity: 0.5;
+
+
+/* ---------------------------------------------------------Floating label
+---------------------------------------------------------*/
+
+$cr-label-color: #777;
+$cr-label-focus-color: #0066cc;
+
+$cr-label-background: white;
+
+:root {
+  --disabled-color: gray;
+  --attr-id: #008000;
+  --badge-color: #000080;
+  --badge-bg-color: #f0f8ff;
+  --bg: #f8f9fa;
+  --border-color: #d3d3d3;
+  --btn-bg: #121212;
+  --btn-text: #121212;
+  --candidate-color: #000080;
+  --candidate-bg-color: #f0f8ff;
+  --candidate-bg-title-color: rgba(148, 217, 242, 0.4);
+  --card: #ffffff;
+  --clickable-label-color: navy;
+  --close-all-color: #000080;
+  --close-all-bg-color: #f0f8ff;
+  --close-all-bg-hover: #87ceeb;
+  --checkbox-label-color: #000080;
+  --drag-color: #0000ff;
+  --drop-color: red;
+  --drop-bg-color: cornsilk;
+  --field-name: #1a1a6c;
+  --field-type-color: #000080;
+  --green-type: green;
+  --input-bg-color: #f8f9fa;
+  --input-color: #121212;
+  --label-bg-color: #e1e1e1;
+  --label-color: #121212;
+  --log-group-color: #000080;
+  --log-group-title: #87ceeb;
+  --model-name: #000080;
+  --model-bg-color: #d3d3d3;
+  --pre-color: #000080;
+  --panel-color: #121212;
+  --panel-bg-color: #f8f9fa;
+  --pink-tomato: #ff6347;
+  --red-type: #ca2c2c;
+  --summary-bg-color: #b3e4f7;
+  --summary-color: #000080;
+  --text: #212529;
+  --tomato-violet: #ff6347;
+  --pre-font: normal 400 13px/20px "Helvetica", sans-serif;
+  --pre-title-color: navy;
+  --pre-title-shadow: rgb(0, 0, 255, 0.5);
+}
+
+:global(.dark) {
+  --disabled-color: gray;
+  --attr-id: #90ee90;
+  --badge-color: navy;
+  --badge-bg-color: #f0f8ff;
+  --border-color: #525252;
+  --btn-bg: #f8f9fa;
+  --btn-text: #f8f9fa;
+  --candidate-color: skyblue;
+  --candidate-bg-color: #121212;
+  --candidate-bg-title-color: #323232;
+  --card: #1e1e1e;
+  --clickable-label-color: skyblue;
+  --close-all-color: skyblue;
+  --close-all-bg-color: #121212;
+  --close-all-bg-hover: #656565;
+  --checkbox-label-color: #87ceeb;
+  --drag-color: navy;
+  --drop-color: lightgreen;
+  --drop-bg-color: #323232;
+  --field-name: rgb(84, 84, 230);
+  --field-type-color: #87ceeb;
+  --green-type: lightgreen;
+  --input-bg-color: #121212;
+  --input-color: lightgreen;
+  --label-bg-color: #323232;
+  --label-color: #a2a2a2;
+  --log-group-color: #a2a2a2;
+  --log-group-title: #525252;
+  --model-name: rgb(109, 154, 239);
+  --model-bg-color: #262323;
+  --pre-color: skyblue;
+  --panel-color: #a2a2a2;
+  --panel-bg-color: #121212;
+  --pink-tomato: rgb(255, 192, 203);
+  --red-type: #f27b7b;
+  --summary-bg-color: skyblue;
+  --summary-color: #121212;
+  --tooltip-color: darkgreen;
+  --tooltip-background-color: lightgray;
+  --text: #e0e0e0;
+  --tomato-violet: #cb739f;
+  --pre-title-color: skyblue;
+  --pre-title-shadow: rgb(255, 255, 255, 0.8);
+}

@@ -27,6 +27,7 @@
 			notAllowedChar = '';
 		}, 800);
 	});
+	log('printing from log');
 </script>
 
 <div style="max-width: 18rem; padding: 6px 1rem;">
@@ -57,6 +58,7 @@
 			}}
 			onmouseleave={() => clearTimeout(timer)}
 		/>
+		<p style="padding;0;margin:0 0 0 -8rem;">allowedChars="[a-zA-z -]"</p>
 		<p style="padding;0;margin:0 0 0 -8rem;">inputValue {inputValue}</p>
 		<p style="padding;0;margin:0 0 0 -8rem;">non-alowed char {notAllowedChar}</p>
 		{#if isZoomed}

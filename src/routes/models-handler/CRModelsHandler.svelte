@@ -3,7 +3,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { capitalize } from '$lib/utils';
 	import Tooltip from '$lib/components/CReactiveTooltip.svelte';
-	import CRUserRolesSelect from '$lib/components/CRModelsPermissions.svelte';
+	import CRUserRolesSelect from '$lib/components/ModelsPermissions.svelte';
 
 	let tooltip: ReturnType<typeof Tooltip>;
 

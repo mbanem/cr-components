@@ -3,15 +3,18 @@
 
 	let cbGroup = $state('');
 	let logGroups = $state([
-		{ id: 1, title: 'Gemini 1', lines: ['line1', 'line2'], status: 'active', active: true },
-		{ id: 2, title: 'Gemini 2', lines: ['line2', 'line3'], status: 'running', active: true },
-		{ id: 3, title: 'Gemini 3', lines: ['line3', 'line4'], status: 'idle', active: false }
+		{ id: 1, title: 'CA 1', lines: ['line1', 'line2'], status: 'active', active: true },
+		{ id: 2, title: 'CA 2', lines: ['line2', 'line3'], status: 'running', active: true },
+		{ id: 3, title: 'CA 3', lines: ['line3', 'line4'], status: 'idle', active: false }
 	]);
 	// let mandatoryEntriesEl: HTMLDivElement;
 	// let dbDepondOnRoleEl: HTMLDivElement;
 	// let validateDbParams: HTMLDivElement;
 	// let verifyDbParamsEl: HTMLButtonElement;
 	// let isOpen = $state(true);
+
+	// cannot show groups if progressMsg is not defined; empty string is OK
+	let progressMsg = $state('Installing packages...');
 	let isInstalling = $state(false);
 	let mandatoryOpacity = $state('0');
 	let progressPercents = $state(0);
@@ -94,17 +97,6 @@
 					</label>
 				{/each}
 				<div class="button-wrapper">
-					<!-- {#if existingDbParts && !paramsAreValid}
-					{@render shouldDeleteDbObjects()}
-				{/if} -->
-
-					<!-- <button
-						class="toggle-status-button"
-						disabled={false}
-						style="padding:6px 0.6rem;text-align:center;color:sienna;"
-					>
-						Toggle Status
-					</button> -->
 					<button
 						style="position:relative;margin:5px 0 0 7.1rem;padding:6px 0.5rem;text-align:center;"
 					>
@@ -138,7 +130,7 @@
 {/if}
 {#snippet shouldDeleteDbObjects()}
 	<div class="db-params-status">
-		{#each arrDBParamsStatus as line (sixHash())}
+		{#each arrDBParamsStatus as line (line[0])}
 			{@const part = line.split(/\s+/)[0].trim() || ''}
 			{#if line.includes('already exists')}
 				<label for={part} style="padding:0;margin:0;cursor:pointer;">
@@ -154,7 +146,6 @@
 					<p style="display:inine-block;padding:0;margin:0;">{line}</p>
 				</label>
 			{/if}
-			<!-- <br /> -->
 		{/each}
 		<button
 			style:color={cbGroup.length === 0 ? 'gray' : 'skyblue'}
@@ -184,7 +175,6 @@
 	{/each}
 </div>
 
-<!-- tooltip markups and AboutPage -->
 <div class="mandatory-entries" style="opacity:{mandatoryOpacity};">
 	<p>Without Credentials for Managing DB</p>
 	<p>Role and DB cannot be created and</p>

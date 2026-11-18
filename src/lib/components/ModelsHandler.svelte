@@ -4,7 +4,7 @@
 	import { capitalize, stringToFieldObject } from '$lib/utils';
 	// import Tooltip from '$lib/components/CReactiveTooltip.svelte';
 	import Tooltip from '$lib/utils/reactive-tooltip';
-	import ModelPermissions from '$lib/components/CRModelsPermissions.svelte';
+	import ModelPermissions from '$lib/components/ModelsPermissions.svelte';
 
 	let tooltip: Tooltip = new Tooltip();
 	// Track child component references per model name

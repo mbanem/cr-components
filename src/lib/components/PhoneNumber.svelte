@@ -93,6 +93,13 @@
 		reformat: ''
 	});
 
+	$effect(() => {
+		if (!s.isDirty) {
+			return;
+		}
+		s.placeholder = REQUIRED + allowCountryCodes ? ' (Ctrl+C for dialCode)' : '';
+		setPlaceholder();
+	});
 	const phoneRegex = /^(\+\d{1,4})?\s*(\d{3}-\d{3}-\d{4})(,\s*ext\.\s*\d{1,5})?$/;
 
 	function isPhoneFormatOK(str: string): boolean {
@@ -163,7 +170,7 @@
 	const REQUIRED_CODEBOX = $derived.by(() => {
 		try {
 			if (!allowCountryCodes) return REQUIRED;
-			inputEl?.offsetHeight;
+			// inputEl?.offsetHeight;
 			return REQUIRED + ' (Ctrl+C for DialCode)';
 		} catch (err: unknown) {
 			handleTryCatch(err, '$derived.by() callback');
@@ -172,12 +179,8 @@
 
 	let timer: ReturnType<typeof setTimeout>;
 	const clearTimeoutMsgs = () => {
-		try {
 			// clearTimeout(timer!);
 			timeoutActionMsg = maxLengthMsg = '';
-		} catch (err: unknown) {
-			handleTryCatch(err, 'clearTimeoutMsgs');
-		}
 	};
 	const errorMessage = $derived.by(() => {
 		if (!s.isDirty && !s.isFocused && !timeoutActionMsg) return '';
@@ -564,7 +567,7 @@
 		justify-content: center;
 		border: 1px solid gray;
 		padding: 0;
-		margin: 1.8rem 0 0 0;
+		margin: 1.8rem 0 0 15rem;
 
 		.candidates-dropdown {
 			display: block;

@@ -40,7 +40,7 @@
 	class="mb-4 rounded bg-blue-500 px-4 py-2 text-white"
 	style="margin: 1rem 0 0.5rem 18rem !important;"
 >
-	toggle countryCodes: {cc ? 'ON' : 'OFF'}
+	toggle countryCodes: {cc ? 'Ctrl+C' : 'OFF'}
 </button>
 
 <div class="demo-wrapper">
@@ -80,8 +80,8 @@
 		border: 1px solid #ccc;
 		border-radius: 6px;
 		padding: 1rem;
-		width: 18rem;
-		margin-left: 14rem;
+		width: 16rem;
+		margin-left: 16rem;
 		background: #fafafa;
 		p {
 			padding: 2px 0;

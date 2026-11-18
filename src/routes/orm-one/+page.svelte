@@ -7,6 +7,7 @@
 	import Tooltip from '$lib/utils/reactive-tooltip';
 	import { anyMissing, sixHash } from '$lib/utils';
 
+	log('we print from log here');
 	// used everywhere but first hide() if visible then show with new argumrnte
 	let tooltip: Tooltip = new Tooltip();
 	let mandatoryEntriesEl: HTMLDivElement;
